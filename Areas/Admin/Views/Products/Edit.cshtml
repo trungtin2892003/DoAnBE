@@ -1,0 +1,131 @@
+﻿@model ShopCake.Models.Product
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="Edit" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <input type="hidden" asp-for="PRO_ID" />
+
+                <!-- Category -->
+                <div class="mb-3">
+                    <label asp-for="CAT_ID" class="form-label fw-bold">Category</label>
+                    <select asp-for="CAT_ID" class="form-select" asp-items="ViewBag.CAT_ID">
+                        <option value="">-- Select Category --</option>
+                    </select>
+                    <span asp-validation-for="CAT_ID" class="text-danger"></span>
+                </div>
+
+                <!-- Avatar -->
+                <div class="form-group">
+                    <label asp-for="Avatar" class="control-label"></label>
+                    <input asp-for="Avatar" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
+                    <span asp-validation-for="Avatar" class="text-danger"></span>
+                </div>
+
+                <!-- Khu vực hiển thị hình ảnh xem trước -->
+                <div class="form-group">
+                    <img id="imagePreview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;" />
+                </div>
+                <!-- Name -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Product Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter product name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Intro -->
+                <div class="mb-3">
+                    <label asp-for="Intro" class="form-label fw-bold">Introduction</label>
+                    <textarea asp-for="Intro" class="form-control" rows="3" placeholder="Short product description"></textarea>
+                    <span asp-validation-for="Intro" class="text-danger"></span>
+                </div>
+
+                <!-- Price -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Price" class="form-label fw-bold">Price</label>
+                        <input asp-for="Price" class="form-control" type="number" step="0.01" placeholder="Enter price" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DiscountPrice" class="form-label fw-bold">Discount Price</label>
+                        <input asp-for="DiscountPrice" class="form-control" type="number" step="0.01" placeholder="Enter discount price" />
+                        <span asp-validation-for="DiscountPrice" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Unit and Rate -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Unit" class="form-label fw-bold">Unit</label>
+                        <input asp-for="Unit" class="form-control" placeholder="e.g., kg, piece" />
+                        <span asp-validation-for="Unit" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Rate" class="form-label fw-bold">Rate</label>
+                        <input asp-for="Rate" class="form-control" type="number" step="0.1" placeholder="Enter rating" />
+                        <span asp-validation-for="Rate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Detailed description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <!-- Details -->
+                <div class="mb-3">
+                    <label asp-for="Details" class="form-label fw-bold">Details</label>
+                    <textarea asp-for="Details" class="form-control" rows="5" placeholder="Additional details"></textarea>
+                    <span asp-validation-for="Details" class="text-danger"></span>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-warning px-4">Save</button>
+                    <a asp-action="Index" class="btn btn-secondary px-4">Back to List</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById("imagePreview");
+
+            // Kiểm tra xem có file nào được chọn không
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                // Khi file được tải xong, gán đường dẫn hình ảnh vào thẻ img
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block"; // Hiển thị hình ảnh
+                };
+
+                // Đọc file ảnh dưới dạng URL
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // Nếu không có file nào được chọn, ẩn hình ảnh
+                preview.style.display = "none";
+            }
+        }
+    </script>
+
+
+}

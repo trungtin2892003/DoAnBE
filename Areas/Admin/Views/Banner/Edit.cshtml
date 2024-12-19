@@ -1,0 +1,93 @@
+﻿@model ShopCake.Models.Banner
+
+@{
+    ViewData["Title"] = "Edit Banner";
+}
+
+<h1>Edit</h1>
+
+<h4>Banner</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="BAN_ID" />
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <input asp-for="Image" class="form-control" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Url" class="control-label"></label>
+                <input asp-for="Url" class="form-control" />
+                <span asp-validation-for="Url" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DisplayOrder" class="control-label"></label>
+                <input asp-for="DisplayOrder" class="form-control" />
+                <span asp-validation-for="DisplayOrder" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreatedDate" class="control-label"></label>
+                <input asp-for="CreatedDate" class="form-control" />
+                <span asp-validation-for="CreatedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="createdBy" class="control-label"></label>
+                <input asp-for="createdBy" class="form-control" />
+                <span asp-validation-for="createdBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="updatedDate" class="control-label"></label>
+                <input asp-for="updatedDate" class="form-control" />
+                <span asp-validation-for="updatedDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="updatedBy" class="control-label"></label>
+                <input asp-for="updatedBy" class="form-control" />
+                <span asp-validation-for="updatedBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById("imagePreview");
+
+            // Kiểm tra xem có file nào được chọn không
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                // Khi file được tải xong, gán đường dẫn hình ảnh vào thẻ img
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block"; // Hiển thị hình ảnh
+                };
+
+                // Đọc file ảnh dưới dạng URL
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // Nếu không có file nào được chọn, ẩn hình ảnh
+                preview.style.display = "none";
+            }
+        }
+    </script>
+
+}

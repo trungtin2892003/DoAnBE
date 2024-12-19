@@ -1,0 +1,88 @@
+﻿@model ShopCake.Models.Team
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <form asp-action="Edit" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <input type="hidden" asp-for="TEAM_ID" />
+
+                <!-- Name -->
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold">Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="Enter team member's name" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Position -->
+                <div class="mb-3">
+                    <label asp-for="Position" class="form-label fw-bold">Position</label>
+                    <input asp-for="Position" class="form-control" placeholder="Enter position" />
+                    <span asp-validation-for="Position" class="text-danger"></span>
+                </div>
+
+                <!-- Avatar -->
+                <div class="form-group">
+                    <label asp-for="PhotoUrl" class="control-label">Photo</label>
+                    <input asp-for="PhotoUrl" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
+                    <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+                </div>
+
+                <!-- Image Preview -->
+                <div class="form-group">
+                    <img id="imagePreview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;" />
+                </div>
+
+                <!-- Facebook URL -->
+                <div class="mb-3">
+                    <label asp-for="FacebookUrl" class="form-label fw-bold">Facebook URL</label>
+                    <input asp-for="FacebookUrl" class="form-control" placeholder="Enter Facebook profile URL" />
+                    <span asp-validation-for="FacebookUrl" class="text-danger"></span>
+                </div>
+
+                <!-- Instagram URL -->
+                <div class="mb-3">
+                    <label asp-for="InstagramUrl" class="form-label fw-bold">Instagram URL</label>
+                    <input asp-for="InstagramUrl" class="form-control" placeholder="Enter Instagram profile URL" />
+                    <span asp-validation-for="InstagramUrl" class="text-danger"></span>
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-warning px-4">Save</button>
+                    <a asp-action="Index" class="btn btn-secondary px-4">Back to List</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById("imagePreview");
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = "none";
+            }
+        }
+    </script>
+}
