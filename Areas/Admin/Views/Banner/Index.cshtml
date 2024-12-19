@@ -1,0 +1,91 @@
+﻿@model IEnumerable<ShopCake.Models.Banner>
+
+@{
+    ViewData["Title"] = "Banner List";
+}
+
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-12">
+                <!-- Default box -->
+                <div class="card card-warning card-outline">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md">
+                                <h3 class="card-title">Banner List</h3>
+                            </div>
+                            <div class="col-md-auto">
+                                <a asp-action="Create" id="btnAdd" type="button" class="btn btn-warning">
+                                    <i class="fas fa-plus me-1"></i> Add New
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <form method="get" action="@Url.Action("Index")">
+                        <div class="input-group my-3">
+                            <input type="text" name="searchString" class="form-control" placeholder="Search by banner title..." value="@ViewData["CurrentFilter"]" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="tbl" class="table table-bordered table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Image</th>
+                                        <th>@Html.DisplayNameFor(model => model.Title)</th>
+                                        <th>@Html.DisplayNameFor(model => model.Url)</th>
+                                        <th>@Html.DisplayNameFor(model => model.DisplayOrder)</th>
+                                        <th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
+                                        <th>@Html.DisplayNameFor(model => model.createdBy)</th>
+                                        <th>@Html.DisplayNameFor(model => model.updatedDate)</th>
+                                        <th>@Html.DisplayNameFor(model => model.updatedBy)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <img src="~/Data/Banner/@item.Image" alt="Banner Image" style="max-width: 100px; max-height: 100px;" />
+                                            </td>
+                                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Url)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.DisplayOrder)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.CreatedDate)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.createdBy)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.updatedDate)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.updatedBy)</td>
+                                            <td>
+                                                <a asp-action="Edit" asp-route-id="@item.BAN_ID" title="Edit" class="text-primary me-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.BAN_ID').submit();" class="text-danger">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                                <form id="deleteForm-@item.BAN_ID" action="@Url.Action("Delete", new { id = item.BAN_ID })" method="post" style="display:none;">
+                                                    @Html.AntiForgeryToken()
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>

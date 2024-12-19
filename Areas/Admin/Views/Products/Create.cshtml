@@ -1,0 +1,184 @@
+﻿@model ShopCake.Models.Product
+
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+
+
+<div class="container mt-5">
+    <!-- Form Title -->
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <h2 class="text-warning">Create New Product</h2>
+            <p class="text-muted">Fill in the details below to create a new product.</p>
+        </div>
+    </div>
+
+    <!-- Form Container -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">Category Details</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <!-- Dropdown for Category -->
+                        <div class="form-group">
+                            <label asp-for="CAT_ID" class="control-label"></label>
+                            <select asp-for="CAT_ID" class="form-control" asp-items="ViewBag.CAT_ID"></select>
+                            <span asp-validation-for="CAT_ID" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Avatar" class="control-label"></label>
+                            <input asp-for="Avatar" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
+                            <span asp-validation-for="Avatar" class="text-danger"></span>
+                        </div>
+
+                        <!-- Khu vực hiển thị hình ảnh xem trước -->
+                        <div class="form-group">
+                            <img id="imagePreview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;" />
+                        </div>
+
+
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Intro" class="control-label"></label>
+                            <input asp-for="Intro" class="form-control" />
+                            <span asp-validation-for="Intro" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-2">
+                            <label asp-for="Price" class="control-label"></label>
+                            <input asp-for="Price" class="form-control" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-2">
+                            <label asp-for="DiscountPrice" class="control-label"></label>
+                            <input asp-for="DiscountPrice" class="form-control" />
+                            <span asp-validation-for="DiscountPrice" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Unit" class="control-label"></label>
+                            <input asp-for="Unit" class="form-control" />
+                            <span asp-validation-for="Unit" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group col-md-2">
+                            <label asp-for="Rate" class="control-label"></label>
+                            <select asp-for="Rate" class="form-control">
+                                <option value="1">1 sao</option>
+                                <option value="2">2 sao</option>
+                                <option value="3">3 sao</option>
+                                <option value="4">4 sao</option>
+                                <option value="5">5 sao</option>
+                            </select>
+                            <span asp-validation-for="Rate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="updatedBy" class="control-label"></label>
+                            <input asp-for="updatedBy" class="form-control" />
+                            <span asp-validation-for="updatedBy" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="control-label"></label>
+                            <input asp-for="Description" class="form-control" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-warning me-2">
+                                <i class="fas fa-save"></i> Create
+                            </button>
+                            <a asp-controller="Category" asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Header {
+    <link rel="stylesheet" href="~/Admin/plugins/ckeditor5/ckeditor5.css">
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="importmap">
+        {
+            "imports": {
+                "ckeditor5": "/Admin/plugins/ckeditor5/ckeditor5.js",
+                "ckeditor5/": "/Admin/plugins/ckeditor5/"
+            }
+        }
+    </script>
+    <script type="module">
+        import {
+            ClassicEditor,
+            Essentials,
+            Paragraph,
+            Bold,
+            Italic,
+            Font
+        } from 'ckeditor5';
+
+        ClassicEditor
+            .create(document.querySelector('#Description'), {
+                plugins: [Essentials, Paragraph, Bold, Italic, Font],
+                toolbar: [
+                    'undo', 'redo', '|', 'bold', 'italic', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor'
+                ]
+            })
+            .then(editor => {
+                window.editor = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById("imagePreview");
+
+            // Kiểm tra xem có file nào được chọn không
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                // Khi file được tải xong, gán đường dẫn hình ảnh vào thẻ img
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block"; // Hiển thị hình ảnh
+                };
+
+                // Đọc file ảnh dưới dạng URL
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // Nếu không có file nào được chọn, ẩn hình ảnh
+                preview.style.display = "none";
+            }
+        }
+    </script>
+
+
+}
