@@ -1,0 +1,62 @@
+﻿@model ShopCake.Models.Setting
+
+@{
+    ViewData["Title"] = "Thêm Cài Đặt Mới";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center text-primary">Thêm Cài Đặt Mới</h1>
+    <hr />
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <!-- Tên -->
+                <div class="form-group mb-3">
+                    <label asp-for="Name" class="form-label">Tên Cài Đặt</label>
+                    <input asp-for="Name" class="form-control" placeholder="Nhập tên cài đặt" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <!-- Giá trị -->
+                <div class="form-group mb-3">
+                    <label asp-for="Value" class="form-label">Giá Trị</label>
+                    <input asp-for="Value" class="form-control" placeholder="Nhập giá trị cài đặt" />
+                    <span asp-validation-for="Value" class="text-danger"></span>
+                </div>
+
+                <!-- Người tạo -->
+                <div class="form-group mb-3">
+                    <label asp-for="createdBy" class="form-label">Người Tạo</label>
+                    <input asp-for="createdBy" class="form-control" placeholder="Nhập tên người tạo" />
+                    <span asp-validation-for="createdBy" class="text-danger"></span>
+                </div>
+
+                <!-- Người cập nhật -->
+                <div class="form-group mb-3">
+                    <label asp-for="updatedBy" class="form-label">Người Cập Nhật</label>
+                    <input asp-for="updatedBy" class="form-control" placeholder="Nhập tên người cập nhật" />
+                    <span asp-validation-for="updatedBy" class="text-danger"></span>
+                </div>
+
+                <!-- Nút thao tác -->
+                <div class="form-group text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay Lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

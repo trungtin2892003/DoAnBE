@@ -76,12 +76,18 @@ namespace ShopCake.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] ProductDTO request)
         {
+            // Lấy thông tin người dùng từ session
             var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
-            if (userInfo == null)
+
+            if (userInfo != null)
             {
+                request.createdBy = request.updatedBy = userInfo.UserName;
+            }
+            else
+            {
+                // Nếu không có thông tin người dùng trong session, trả về lỗi hoặc redirect.
                 return RedirectToAction("Login", "User");
             }
-
             var product = new Product
             {
                 PRO_ID = request.PRO_ID,
@@ -157,7 +163,7 @@ namespace ShopCake.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PRO_ID,CAT_ID,Avatar,Name,Intro,Price,DiscountPrice,Unit,Rate,Description,Details")] Product product)
+        public async Task<IActionResult> Edit(int id, [FromForm] Product product)
         {
             if (id != product.PRO_ID)
             {

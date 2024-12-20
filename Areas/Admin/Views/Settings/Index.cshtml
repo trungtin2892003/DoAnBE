@@ -1,0 +1,65 @@
+﻿@model IEnumerable<ShopCake.Models.Setting>
+
+@{
+    ViewData["Title"] = "Quản lý Cài đặt";
+}
+
+<div class="container mt-4">
+
+    <div class="mb-3">
+        <a class="btn btn-success" asp-action="Create">
+            <i class="fas fa-plus"></i> Thêm Cài đặt Mới
+        </a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Tên Cài đặt</th>
+                <th>Giá trị</th>
+                <th>Ngày Tạo</th>
+                <th>Người Tạo</th>
+                <th>Ngày Cập nhật</th>
+                <th>Người Cập nhật</th>
+                <th class="text-center">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                int index = 1;
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@index</td>
+                        <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                        <td>@Html.DisplayFor(modelItem => item.Value)</td>
+                        <td>@Html.DisplayFor(modelItem => item.CreatedDate)</td>
+                        <td>@Html.DisplayFor(modelItem => item.createdBy)</td>
+                        <td>@Html.DisplayFor(modelItem => item.updatedDate)</td>
+                        <td>@Html.DisplayFor(modelItem => item.updatedBy)</td>
+                        <td class="text-center">
+                            <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.SET_ID">
+                                <i class="fas fa-edit"></i> Sửa
+                            </a>
+                            <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@item.SET_ID">
+                                <i class="fas fa-info-circle"></i> Chi tiết
+                            </a>
+                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.SET_ID" onclick="return confirm('Bạn có chắc chắn muốn xóa cài đặt này?');">
+                                <i class="fas fa-trash"></i> Xóa
+                            </a>
+                        </td>
+                    </tr>
+                    index++;
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center text-muted">Không có dữ liệu hiển thị</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

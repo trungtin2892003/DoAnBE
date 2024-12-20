@@ -1,49 +1,148 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-    ViewData["tittle"] = "Home";
+﻿@{
+    ViewData["Title"] = "Dashboard";
 }
-<main class="app-main">
-    <!--begin::App Content Header-->
-    <div class="app-content-header">
-        <!--begin::Container-->
-        <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-                <div class="col-sm-6">
-                    <h3 class="mb-0">Collapsed Sidebar</h3>
+
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="text-center">Admin Dashboard</h2>
+        </div>
+    </div>
+
+    <!-- Cards Tổng quan -->
+    <div class="row">
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-primary shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Total Products</h5>
+                    <p class="card-text display-4">@ViewBag.TotalProducts</p>
                 </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-end">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Collapsed Sidebar
-                        </li>
-                    </ol>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Orders</h5>
+                    <p class="card-text display-4">@ViewBag.TotalOrders</p>
                 </div>
-            </div> <!--end::Row-->
-        </div> <!--end::Container-->
-    </div> <!--end::App Content Header--> <!--begin::App Content-->
-    <div class="app-content">
-        <!--begin::Container-->
-        <div class="container-fluid">
-            <!--begin::Row-->
-            <div class="row">
-                <div class="col-12">
-                    <!-- Default box -->
-                    <div class="card card-warning card-outline">
-                        <div class="card-header">
-                            <h3 class="card-title">Title</h3>
-                            <div class="card-tools"> <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse" title="Collapse"> <i data-lte-icon="expand" class="bi bi-plus-lg"></i> <i data-lte-icon="collapse" class="bi bi-dash-lg"></i> </button> <button type="button" class="btn btn-tool" data-lte-toggle="card-remove" title="Remove"> <i class="bi bi-x-lg"></i> </button> </div>
-                        </div>
-                        <div class="card-body">
-                            Start creating your amazing application!
-                        </div> <!-- /.card-body -->
-                        <div class="card-footer">Footer</div> <!-- /.card-footer-->
-                    </div> <!-- /.card -->
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-warning shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Revenue</h5>
+                    <p class="card-text display-4">$@ViewBag.Revenue</p>
                 </div>
-            </div> <!--end::Row-->
-        </div> <!--end::Container-->
-    </div> <!--end::App Content-->
-</main> <!--end::App Main--> <!--begin::Footer-->
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-danger shadow">
+                <div class="card-body">
+                    <h5 class="card-title">New Users</h5>
+                    <p class="card-text display-4">@ViewBag.NewUsers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ thống kê -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-info text-white">
+                    <h5>Sales Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-secondary text-white">
+                    <h5>Top Categories</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Cakes <span class="badge bg-primary">120</span></li>
+                    <li class="list-group-item">Pastries <span class="badge bg-primary">80</span></li>
+                    <li class="list-group-item">Cookies <span class="badge bg-primary">50</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách ngắn -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h5>Recent Orders</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#001</td>
+                                <td>John Doe</td>
+                                <td>$150</td>
+                                <td><span class="badge bg-success">Completed</span></td>
+                                <td>2024-06-10</td>
+                            </tr>
+                            <tr>
+                                <td>#002</td>
+                                <td>Jane Smith</td>
+                                <td>$200</td>
+                                <td><span class="badge bg-warning">Pending</span></td>
+                                <td>2024-06-11</td>
+                            </tr>
+                            <tr>
+                                <td>#003</td>
+                                <td>Michael Brown</td>
+                                <td>$320</td>
+                                <td><span class="badge bg-danger">Cancelled</span></td>
+                                <td>2024-06-12</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Biểu đồ JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('salesChart').getContext('2d');
+    var salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Sales',
+                data: [1200, 1500, 1800, 2000, 2200, 2500],
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>

@@ -1,6 +1,8 @@
-﻿namespace ShopCake.Areas.Admin.DTO
+﻿using ShopCake.Models;
+
+namespace ShopCake.Areas.Admin.DTO
 {
-    public class ProductDTO
+    public class ProductDTO:BaseModel
     {
         public int PRO_ID { get; set; }
 
