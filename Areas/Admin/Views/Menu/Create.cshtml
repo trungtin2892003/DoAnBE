@@ -1,0 +1,92 @@
+﻿@model ShopCake.Models.Menu
+
+@{
+    ViewData["Title"] = "Create Menu";
+}
+
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-md-12 text-center">
+            <h2 class="text-warning">Create New Menu</h2>
+            <p class="text-muted">Fill in the details below to create a new menu.</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">Menu Details</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <!-- Parent Menu -->
+                        <div class="form-group">
+                            <label asp-for="PARENT_ID" class="control-label"></label>
+                            <select asp-for="PARENT_ID" class="form-control" asp-items="ViewBag.PARENT_ID"></select>
+                            <span asp-validation-for="PARENT_ID" class="text-danger"></span>
+                        </div>
+
+                        <!-- Menu Title -->
+                        <div class="form-group">
+                            <label asp-for="Title" class="control-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <!-- URL -->
+                        <div class="form-group">
+                            <label asp-for="Url" class="control-label"></label>
+                            <input asp-for="Url" class="form-control" />
+                            <span asp-validation-for="Url" class="text-danger"></span>
+                        </div>
+
+                        <!-- Created Date -->
+                        <div class="form-group">
+                            <label asp-for="CreatedDate" class="control-label"></label>
+                            <input asp-for="CreatedDate" class="form-control" />
+                            <span asp-validation-for="CreatedDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Created By -->
+                        <div class="form-group">
+                            <label asp-for="createdBy" class="control-label"></label>
+                            <input asp-for="createdBy" class="form-control" />
+                            <span asp-validation-for="createdBy" class="text-danger"></span>
+                        </div>
+
+                        <!-- Updated Date -->
+                        <div class="form-group">
+                            <label asp-for="updatedDate" class="control-label"></label>
+                            <input asp-for="updatedDate" class="form-control" />
+                            <span asp-validation-for="updatedDate" class="text-danger"></span>
+                        </div>
+
+                        <!-- Updated By -->
+                        <div class="form-group">
+                            <label asp-for="updatedBy" class="control-label"></label>
+                            <input asp-for="updatedBy" class="form-control" />
+                            <span asp-validation-for="updatedBy" class="text-danger"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group text-center">
+                            <input type="submit" value="Create" class="btn btn-warning me-2" />
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,89 @@
+﻿@model IEnumerable<ShopCake.Models.Menu>
+
+@{
+    ViewData["Title"] = "Menu List";
+}
+
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-12">
+                <!-- Default box -->
+                <div class="card card-warning card-outline">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md">
+                                <h3 class="card-title">Menu List</h3>
+                            </div>
+                            <div class="col-md-auto">
+                                <a asp-action="Create" id="btnAdd" type="button" class="btn btn-warning">
+                                    <i class="fas fa-plus me-1"></i> Add New
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search form -->
+                    <form method="get" action="@Url.Action("Index")">
+                        <div class="input-group my-3">
+                            <input type="text" name="searchString" class="form-control" placeholder="Search by menu title..." value="@ViewData["CurrentFilter"]" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="tbl" class="table table-bordered table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>@Html.DisplayNameFor(model => model.Title)</th>
+                                        <th>@Html.DisplayNameFor(model => model.Url)</th>
+                                        <th>@Html.DisplayNameFor(model => model.PARENT_ID)</th>
+                                        <th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
+                                        <th>@Html.DisplayNameFor(model => model.createdBy)</th>
+                                        <th>@Html.DisplayNameFor(model => model.updatedDate)</th>
+                                        <th>@Html.DisplayNameFor(model => model.updatedBy)</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.Url)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.PARENT_ID)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.CreatedDate)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.createdBy)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.updatedDate)</td>
+                                            <td>@Html.DisplayFor(modelItem => item.updatedBy)</td>
+                                            <td>
+                                                <a asp-action="Edit" asp-route-id="@item.MEN_ID" class="text-primary me-2">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </a>
+                                                <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.MEN_ID').submit();" class="text-danger">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </a>
+                                                <form id="deleteForm-@item.MEN_ID" action="@Url.Action("Delete", new { id = item.MEN_ID })" method="post" style="display:none;">
+                                                    @Html.AntiForgeryToken()
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</div>
