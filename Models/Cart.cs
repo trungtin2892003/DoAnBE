@@ -4,40 +4,27 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace ShopCake.Models
 {
     [Table("Carts")]
-    public class Cart:BaseModel
+    public class Cart : BaseModel
     {
         [Key]
         public int CAR_ID { get; set; } // Mã giỏ hàng
 
-        [Required]
-        public int USE_ID { get; set; } // Mã người dùng (User)
+        public int USE_ID { get; set; }
+        public int MEM_ID { get; set; }
+        public DateTime CartDate { get; set; }
+        public string CustomerName { get; set; }
+        public string Phone { get; set; }
+        public string Address { get; set; }
+        public decimal TotalPrice { get; set; }
+        public decimal Discount { get; set; }
+        public string PaymentMethod { get; set; }
+        public string Note { get; set; }
+        public string Status { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime UpdatedDate { get; set; }
+        public string UpdatedBy { get; set; }
 
-        [Required]
-        public int MEM_ID { get; set; } // Mã thành viên (Member)
-
-        public DateTime CartDate { get; set; } = DateTime.Now; // Ngày tạo giỏ hàng
-
-        [StringLength(255)]
-        public string? CustomerName { get; set; } // Tên khách hàng
-
-        [StringLength(20)]
-        public string? Phone { get; set; } // Số điện thoại
-
-        [StringLength(255)]
-        public string? Address { get; set; } // Địa chỉ giao hàng
-
-        public decimal TotalPrice { get; set; } // Tổng giá trị đơn hàng
-
-        public float Discount { get; set; } // Giảm giá (nếu có)
-
-        [StringLength(50)]
-        public string? PaymentMethod { get; set; } // Phương thức thanh toán
-
-        [StringLength(500)]
-        public string? Note { get; set; } // Ghi chú của khách hàng
-
-        [Required]
-        public int Status { get; set; } // Trạng thái đơn hàng (ví dụ: 0 - đang xử lý, 1 - hoàn thành)
 
 
         // Quan hệ với các bảng khác

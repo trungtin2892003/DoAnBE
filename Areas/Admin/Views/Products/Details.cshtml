@@ -1,78 +1,68 @@
 ﻿@model ShopCake.Models.Product
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Product Details";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Avatar)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Avatar)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Intro)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Intro)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DiscountPrice)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DiscountPrice)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Unit)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Unit)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Details)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Details)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.CAT_ID)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.PRO_ID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-white">
+            <h3 class="mb-0">@Html.DisplayFor(model => model.Name)</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Avatar):</div>
+                <div class="col-md-8">
+                    @if (!string.IsNullOrEmpty(Model.Avatar))
+                    {
+                        <img src="~/Data/Product/@Model.Avatar" alt="Product Avatar" class="img-fluid rounded" style="max-height: 200px;" />
+                    }
+                    else
+                    {
+                        <span>No Image Available</span>
+                    }
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Name):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.Name)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Intro):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.Intro)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Price):</div>
+                <div class="col-md-8 text-success font-weight-bold">$@Html.DisplayFor(model => model.Price)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.DiscountPrice):</div>
+                <div class="col-md-8 text-danger font-weight-bold">$@Html.DisplayFor(model => model.DiscountPrice)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Unit):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.Unit)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Rate):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.Rate) / 5</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Description):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.Description)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Details):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.Details)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Category):</div>
+                <div class="col-md-8">Category ID: @Html.DisplayFor(model => model.Category.CAT_ID)</div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <a asp-action="Edit" asp-route-id="@Model?.PRO_ID" class="btn btn-primary">Edit</a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
 </div>

@@ -1,4 +1,5 @@
-﻿@model ShopCake.Models.Product
+﻿@model ShopCake.Areas.Admin.DTO.ProductDTO
+
 
 @{
     ViewData["Title"] = "Create Product";
@@ -7,20 +8,14 @@
 
 
 <div class="container mt-5">
-    <!-- Form Title -->
-    <div class="row mb-4">
-        <div class="col-md-12 text-center">
-            <h2 class="text-warning">Create New Product</h2>
-            <p class="text-muted">Fill in the details below to create a new product.</p>
-        </div>
-    </div>
+ 
 
     <!-- Form Container -->
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-lg">
                 <div class="card-header bg-warning text-white">
-                    <h5 class="mb-0">Category Details</h5>
+                    <h5 class="mb-0">Add new product</h5>
                 </div>
                 <div class="card-body">
                     <form asp-action="Create" enctype="multipart/form-data">
@@ -32,13 +27,11 @@
                             <select asp-for="CAT_ID" class="form-control" asp-items="ViewBag.CAT_ID"></select>
                             <span asp-validation-for="CAT_ID" class="text-danger"></span>
                         </div>
-
                         <div class="form-group">
                             <label asp-for="Avatar" class="control-label"></label>
                             <input asp-for="Avatar" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
                             <span asp-validation-for="Avatar" class="text-danger"></span>
                         </div>
-
                         <!-- Khu vực hiển thị hình ảnh xem trước -->
                         <div class="form-group">
                             <img id="imagePreview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;" />
@@ -47,7 +40,7 @@
 
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
-                            <input asp-for="Name" class="form-control" />
+                            <input asp-for="Name" class="form-control" type="text"/>
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
 
@@ -87,11 +80,6 @@
                             <span asp-validation-for="Rate" class="text-danger"></span>
                         </div>
 
-                        <div class="form-group">
-                            <label asp-for="updatedBy" class="control-label"></label>
-                            <input asp-for="updatedBy" class="form-control" />
-                            <span asp-validation-for="updatedBy" class="text-danger"></span>
-                        </div>
 
                         <div class="form-group">
                             <label asp-for="Description" class="control-label"></label>
@@ -103,7 +91,7 @@
                             <button type="submit" class="btn btn-warning me-2">
                                 <i class="fas fa-save"></i> Create
                             </button>
-                            <a asp-controller="Category" asp-action="Index" class="btn btn-secondary">
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to List
                             </a>
                         </div>
@@ -179,6 +167,8 @@
             }
         }
     </script>
-
+   
+    <partial name="_ValidationScriptsPartial" />
+}
 
 }

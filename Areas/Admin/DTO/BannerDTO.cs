@@ -1,6 +1,6 @@
 ﻿namespace ShopCake.Areas.Admin.DTO
 {
-    public class BannerDTO
+    public class BannerDTO  
     {
         public int BAN_ID { get; set; }
         public string? Title { get; set; }

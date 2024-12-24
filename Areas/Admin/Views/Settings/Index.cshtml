@@ -43,12 +43,13 @@
                             <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.SET_ID">
                                 <i class="fas fa-edit"></i> Sửa
                             </a>
-                            <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@item.SET_ID">
-                                <i class="fas fa-info-circle"></i> Chi tiết
+
+                            <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.SET_ID').submit();" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash-alt"></i>Xóa
                             </a>
-                            <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@item.SET_ID" onclick="return confirm('Bạn có chắc chắn muốn xóa cài đặt này?');">
-                                <i class="fas fa-trash"></i> Xóa
-                            </a>
+                            <form id="deleteForm-@item.SET_ID" action="@Url.Action("Delete", new { id = item.SET_ID })" method="post" style="display:none;">
+                                @Html.AntiForgeryToken()
+                            </form>
                         </td>
                     </tr>
                     index++;

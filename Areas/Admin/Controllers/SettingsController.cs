@@ -80,6 +80,7 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Admin/Settings/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+
             if (id == null)
             {
                 return NotFound();
@@ -100,6 +101,12 @@ namespace ShopCake.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SET_ID,Name,Value,CreatedDate,createdBy,updatedDate,updatedBy")] Setting setting)
         {
+            var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
+
+            if (userInfo != null)
+            {
+                setting.updatedBy = userInfo.UserName;
+            }
             if (id != setting.SET_ID)
             {
                 return NotFound();

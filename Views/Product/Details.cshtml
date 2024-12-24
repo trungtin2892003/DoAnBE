@@ -1,8 +1,6 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ShopCake.Models.Product
 @{
-    ViewData["tittle"] = "Details";
+    ViewData["Title"] = "Chi tiet san pham";
 }
 <!-- Breadcrumb Begin -->
 <div class="breadcrumb-option">
@@ -31,45 +29,46 @@
             <div class="col-lg-6">
                 <div class="product__details__img">
                     <div class="product__details__big__img">
-                        <img class="big_img" src="~/img/shop/details/product-big-1.jpg" alt="">
-                    </div>
-                    <div class="product__details__thumb">
-                        <div class="pt__item active">
-                            <img data-imgbigurl="~/img/shop/details/product-big-2.jpg"
-                                 src="~/img/shop/details/product-big-2.jpg" alt="">
-                        </div>
-                        <div class="pt__item">
-                            <img data-imgbigurl="~/img/shop/details/product-big-1.jpg"
-                                 src="~/img/shop/details/product-big-1.jpg" alt="">
-                        </div>
-                        <div class="pt__item">
-                            <img data-imgbigurl="~/img/shop/details/product-big-4.jpg"
-                                 src="~/img/shop/details/product-big-4.jpg" alt="">
-                        </div>
-                        <div class="pt__item">
-                            <img data-imgbigurl="~/img/shop/details/product-big-3.jpg"
-                                 src="~/img/shop/details/product-big-3.jpg" alt="">
-                        </div>
-                        <div class="pt__item">
-                            <img data-imgbigurl="~/img/shop/details/product-big-5.jpg"
-                                 src="~/img/shop/details/product-big-5.jpg" alt="">
-                        </div>
+                        <img class="big_img" src="~/Data/Product/@Model.Avatar" alt="">
                     </div>
                 </div>
             </div>
             <div class="col-lg-6">
                 <div class="product__details__text">
                     <div class="product__label">Cupcake</div>
-                    <h4>SWEET AUTUMN LEAVES</h4>
-                    <h5>$26.41</h5>
+                    <h4>@Model.Name</h4>
+                    <h5>$@Model.Price</h5>
                     <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, eiusmod tempor incididunt ut labore
-                        et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida
+                       @Model.Intro
                     </p>
                     <ul>
+                        <style>
+                            .star-filled {
+                                color: gold; /* Màu vàng cho ngôi sao đã đánh giá */
+                            }
+
+                            .star-empty {
+                                color: lightgray; /* Màu xám nhạt cho ngôi sao chưa đánh giá */
+                            }
+                        </style>
+
+                        <!-- Cập nhật mã HTML -->
                         <li>SKU: <span>17</span></li>
-                        <li>Category: <span>Biscuit cake</span></li>
+
+                        <!-- Hiển thị số sao đầy (đã đánh giá) -->
+                        @for (int i = 0; i < Model.Rate; i++)
+                        {
+                            <i class="fa fa-star star-filled"></i>
+                        }
+
+                        <!-- Hiển thị số sao trống (chưa đánh giá) -->
+                        @for (int i = 0; i < (5 - Model.Rate); i++)
+                        {
+                            <i class="fa fa-star star-empty"></i>
+                        }
+
                         <li>Tags: <span>Gadgets, minimalisstic</span></li>
+
                     </ul>
                     <div class="product__details__option">
                         <div class="quantity">

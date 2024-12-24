@@ -75,190 +75,73 @@
         </div>
     </section>
     <!-- About Section End -->
+@{
+    // Lấy danh sách danh mục từ ViewData
+    var categories = ViewData["Categories"] as List<Category> ?? new List<Category>();
+}
 
-    <!-- Categories Section Begin -->
-    <div class="categories">
-        <div class="container">
-            <div class="row">
-                <div class="categories__slider owl-carousel">
-                    <div class="categories__item">
+<!-- Categories Section Begin -->
+<div class="categories">
+    <div class="container">
+        <div class="row">
+            <!-- Thanh điều hướng dạng slider cho các danh mục -->
+            <div class="categories__slider owl-carousel">
+                @foreach (var category in categories)
+                {
+                    <a class="categories__item nav-link @((categories.IndexOf(category) == 0 ? "active" : ""))"
+                       data-bs-toggle="pill"
+                       data-bs-target="#tab-@category.CAT_ID">
                         <div class="categories__item__icon">
                             <span class="flaticon-029-cupcake-3"></span>
-                            <h5>Cupcake</h5>
+                            <h5>@category.Name</h5>
                         </div>
-                    </div>
-                    <div class="categories__item">
-                        <div class="categories__item__icon">
-                            <span class="flaticon-034-chocolate-roll"></span>
-                            <h5>Butter</h5>
-                        </div>
-                    </div>
-                    <div class="categories__item">
-                        <div class="categories__item__icon">
-                            <span class="flaticon-005-pancake"></span>
-                            <h5>Red Velvet</h5>
-                        </div>
-                    </div>
-                    <div class="categories__item">
-                        <div class="categories__item__icon">
-                            <span class="flaticon-030-cupcake-2"></span>
-                            <h5>Biscuit</h5>
-                        </div>
-                    </div>
-                    <div class="categories__item">
-                        <div class="categories__item__icon">
-                            <span class="flaticon-006-macarons"></span>
-                            <h5>Donut</h5>
-                        </div>
-                    </div>
-                    <div class="categories__item">
-                        <div class="categories__item__icon">
-                            <span class="flaticon-006-macarons"></span>
-                            <h5>Cupcake</h5>
-                        </div>
-                    </div>
-                </div>
+                    </a>
+                }
             </div>
         </div>
     </div>
-    <!-- Categories Section End -->
-
-    <!-- Product Section Begin -->
-    <section class="product spad">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-1.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
+</div>
+<!-- Categories Section End -->
+<!-- Product Section Begin -->
+<section class="product spad">
+    <div class="container">
+        <div class="tab-content">
+            @foreach (var category in categories)
+            {
+                <!-- Nội dung sản phẩm theo danh mục -->
+                <div class="tab-pane fade @((categories.IndexOf(category) == 0 ? "show active" : ""))"
+                     id="tab-@category.CAT_ID">
+                    <div class="row">
+                        @foreach (var product in category.Products)
+                        {
+                            <div class="col-lg-3 col-md-6 col-sm-6">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.PRO_ID" class="text-dark">
+                                    <div class="product__item">
+                                        <!-- Hình ảnh sản phẩm -->
+                                        <div class="product__item__pic set-bg" data-setbg="/Data/product/@product.Avatar">
+                                            <div class="product__label">
+                                                <span>@category.Name</span>
+                                            </div>
+                                        </div>
+                                        <!-- Thông tin sản phẩm -->
+                                        <div class="product__item__text">
+                                            <h6>@product.Name</h6>
+                                            <div class="product__item__price">$@product.Price</div>
+                                            <div class="cart_add">
+                                                <a href="#">Add to cart</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
                             </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Dozen Cupcakes</a></h6>
-                            <div class="product__item__price">$32.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
+                        }
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-2.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
-                            </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Cookies and Cream</a></h6>
-                            <div class="product__item__price">$30.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-3.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
-                            </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Gluten Free Mini Dozen</a></h6>
-                            <div class="product__item__price">$31.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-4.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
-                            </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Cookie Dough</a></h6>
-                            <div class="product__item__price">$25.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-5.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
-                            </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Vanilla Salted Caramel</a></h6>
-                            <div class="product__item__price">$05.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-6.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
-                            </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">German Chocolate</a></h6>
-                            <div class="product__item__price">$14.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-7.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
-                            </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Dulce De Leche</a></h6>
-                            <div class="product__item__price">$32.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <div class="product__item">
-                        <div class="product__item__pic set-bg" data-setbg="img/shop/product-8.jpg">
-                            <div class="product__label">
-                                <span>Cupcake</span>
-                            </div>
-                        </div>
-                        <div class="product__item__text">
-                            <h6><a href="#">Mississippi Mud</a></h6>
-                            <div class="product__item__price">$08.00</div>
-                            <div class="cart_add">
-                                <a href="#">Add to cart</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            }
         </div>
-    </section>
-    <!-- Product Section End -->
+    </div>
+</section>
+<!-- Product Section End -->
 
     <!-- Class Section Begin -->
     <section class="class spad">
@@ -593,4 +476,10 @@
             <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d10784.188505644011!2d19.053119335158936!3d47.48899529453826!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sbd!4v1543907528304" height="300" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"></iframe>
         </div>
     </div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}}
     <!-- Map End -->

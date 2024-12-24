@@ -9,7 +9,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <form asp-action="Edit" enctype="multipart/form-data" class="shadow p-4 rounded bg-light">
+            <form asp-action="Edit" method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                 <input type="hidden" asp-for="PRO_ID" />
 
@@ -23,11 +23,14 @@
                 </div>
 
                 <!-- Avatar -->
+                <!-- Khu vực hiển thị hình ảnh xem trước -->
                 <div class="form-group">
-                    <label asp-for="Avatar" class="control-label"></label>
-                    <input asp-for="Avatar" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
-                    <span asp-validation-for="Avatar" class="text-danger"></span>
+                    <img id="imagePreview"
+                         src="@(!string.IsNullOrEmpty(Model.Avatar) ? Url.Content("~/Data/Product/" + Model.Avatar) : "#")"
+                         alt="Preview"
+                         style="max-width: 200px; max-height: 200px; display: @(string.IsNullOrEmpty(Model.Avatar) ? "none" : "block"); margin-top: 10px;" />
                 </div>
+
 
                 <!-- Khu vực hiển thị hình ảnh xem trước -->
                 <div class="form-group">
@@ -76,18 +79,14 @@
                 </div>
 
                 <!-- Description -->
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label fw-bold">Description</label>
-                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Detailed description"></textarea>
+                <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <textarea asp-for="Description" id="Description" class="form-control"></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
                 <!-- Details -->
-                <div class="mb-3">
-                    <label asp-for="Details" class="form-label fw-bold">Details</label>
-                    <textarea asp-for="Details" class="form-control" rows="5" placeholder="Additional details"></textarea>
-                    <span asp-validation-for="Details" class="text-danger"></span>
-                </div>
+            
 
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between">
@@ -99,10 +98,46 @@
     </div>
 </div>
 
+@section Header {
+    <link rel="stylesheet" href="~/Admin/plugins/ckeditor5/ckeditor5.css">
+}
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script type="importmap">
+        {
+            "imports": {
+                "ckeditor5": "/Admin/plugins/ckeditor5/ckeditor5.js",
+                "ckeditor5/": "/Admin/plugins/ckeditor5/"
+            }
+        }
+    </script>
+    <script type="module">
+        import {
+            ClassicEditor,
+            Essentials,
+            Paragraph,
+            Bold,
+            Italic,
+            Font
+        } from 'ckeditor5';
+
+        ClassicEditor
+            .create(document.querySelector('#Description'), {
+                plugins: [Essentials, Paragraph, Bold, Italic, Font],
+                toolbar: [
+                    'undo', 'redo', '|', 'bold', 'italic', '|',
+                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor'
+                ]
+            })
+            .then(editor => {
+                window.editor = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    </script>
     <script>
         function previewImage(event) {
             const input = event.target;

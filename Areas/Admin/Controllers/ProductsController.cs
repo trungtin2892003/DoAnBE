@@ -29,7 +29,7 @@ namespace ShopCake.Areas.Admin.Controllers
         {
             // Lưu từ khóa tìm kiếm vào ViewData để hiển thị lại trong View
             ViewData["CurrentFilter"] = searchString;
-
+          
             // Lấy toàn bộ danh sách sản phẩm
             var products = _context.Products.AsQueryable();
 
@@ -85,9 +85,29 @@ namespace ShopCake.Areas.Admin.Controllers
             }
             else
             {
-                // Nếu không có thông tin người dùng trong session, trả về lỗi hoặc redirect.
                 return RedirectToAction("Login", "User");
             }
+            if (!ModelState.IsValid)
+            {
+                // Trả về View cùng với thông báo lỗi
+                ViewData["CAT_ID"] = new SelectList(_context.Categories, "CAT_ID", "CAT_ID", request.CAT_ID);
+                return View(request);
+            }
+            // Kiểm tra dữ liệu đầu vào
+            if (string.IsNullOrEmpty(request.Name))
+            {
+                ModelState.AddModelError("Name", "Tên sản phẩm không được để trống.");
+            }
+            else if (request.Name.Any(char.IsDigit)) // Kiểm tra nếu chứa số
+            {
+                ModelState.AddModelError("Name", "Tên sản phẩm không được chứa số.");
+            }
+
+            if (request.Price <= 0)
+            {
+                ModelState.AddModelError("Price", "Giá sản phẩm phải lớn hơn 0.");
+            }
+            // Khởi tạo đối tượng Product
             var product = new Product
             {
                 PRO_ID = request.PRO_ID,
@@ -104,40 +124,35 @@ namespace ShopCake.Areas.Admin.Controllers
                 updatedBy = userInfo.UserName,
             };
 
-            if (ModelState.IsValid)
+            // Xử lý lưu ảnh
+            string? newImageFileName = null;
+            if (request.Avatar != null && request.Avatar.Length > 0)
             {
-                string? newImageFileName = null;
-
-                if (request.Avatar != null && request.Avatar.Length > 0)
+                var folderPath = Path.Combine(_hostEnv.WebRootPath, "Data", "Product");
+                if (!Directory.Exists(folderPath))
                 {
-                    var folderPath = Path.Combine(_hostEnv.WebRootPath, "Data", "Product");
-                    if (!Directory.Exists(folderPath))
-                    {
-                        Directory.CreateDirectory(folderPath);
-                    }
-
-                    var extension = Path.GetExtension(request.Avatar.FileName);
-                    newImageFileName = $"{Guid.NewGuid()}{extension}";
-                    var filePath = Path.Combine(folderPath, newImageFileName);
-
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await request.Avatar.CopyToAsync(fileStream);
-                    }
+                    Directory.CreateDirectory(folderPath);
                 }
 
-                if (newImageFileName != null)
-                {
-                    product.Avatar = newImageFileName;
-                }
+                var extension = Path.GetExtension(request.Avatar.FileName);
+                newImageFileName = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(folderPath, newImageFileName);
 
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.Avatar.CopyToAsync(fileStream);
+                }
             }
 
-            ViewData["CAT_ID"] = new SelectList(_context.Categories, "CAT_ID", "CAT_ID", product.CAT_ID);
-            return View(product);
+            if (newImageFileName != null)
+            {
+                product.Avatar = newImageFileName;
+            }
+
+            // Lưu vào cơ sở dữ liệu
+            _context.Add(product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -154,16 +169,15 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
             ViewData["CAT_ID"] = new SelectList(_context.Categories, "CAT_ID", "CAT_ID", product.CAT_ID);
             return View(product);
         }
 
         // POST: Admin/Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromForm] Product product)
+        public async Task<IActionResult> Edit(int id, [FromForm] Product product, IFormFile? Avatar)
         {
             if (id != product.PRO_ID)
             {
@@ -174,8 +188,63 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(product);
+                    // Lấy sản phẩm từ cơ sở dữ liệu
+                    var existingProduct = await _context.Products.FindAsync(id);
+                    if (existingProduct == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Cập nhật thông tin sản phẩm (trừ ảnh)
+                    existingProduct.Name = product.Name;
+                    existingProduct.Intro = product.Intro;
+                    existingProduct.Price = product.Price;
+                    existingProduct.DiscountPrice = product.DiscountPrice;
+                    existingProduct.Unit = product.Unit;
+                    existingProduct.Rate = product.Rate;
+                    existingProduct.Description = product.Description;
+                    existingProduct.Details = product.Details;
+                    existingProduct.CAT_ID = product.CAT_ID;
+
+                    // Xử lý ảnh nếu có upload
+                    if (Avatar != null && Avatar.Length > 0)
+                    {
+                        // Thư mục lưu ảnh
+                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Data/Product");
+
+                        // Tạo thư mục nếu chưa tồn tại
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+
+                        // Xóa ảnh cũ nếu có
+                        if (!string.IsNullOrEmpty(existingProduct.Avatar))
+                        {
+                            var oldImagePath = Path.Combine(uploadsFolder, existingProduct.Avatar);
+                            if (System.IO.File.Exists(oldImagePath))
+                            {
+                                System.IO.File.Delete(oldImagePath);
+                            }
+                        }
+
+                        // Lưu ảnh mới
+                        var uniqueFileName = $"{Guid.NewGuid()}_{Path.GetFileName(Avatar.FileName)}";
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await Avatar.CopyToAsync(fileStream);
+                        }
+
+                        // Cập nhật đường dẫn ảnh
+                        existingProduct.Avatar = uniqueFileName;
+                    }
+
+                    // Lưu thay đổi vào cơ sở dữ liệu
+                    _context.Update(existingProduct);
                     await _context.SaveChangesAsync();
+
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -188,11 +257,14 @@ namespace ShopCake.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
+
             ViewData["CAT_ID"] = new SelectList(_context.Categories, "CAT_ID", "CAT_ID", product.CAT_ID);
             return View(product);
         }
+
+       
+
 
         // GET: Admin/Products/Delete/5
         public async Task<IActionResult> Delete(int? id)

@@ -11,6 +11,7 @@ namespace ShopCake.Models
         public string? Title { get; set; }
         public string? Image { get; set; }
         public string? Url { get; set; }
+        [Range(0, double.MaxValue, ErrorMessage = "Giá TRỊ phải lớn hơn hoặc bằng 0.")]
         public int DisplayOrder { get; set; }
 
     }

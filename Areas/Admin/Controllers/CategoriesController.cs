@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using ShopCake.Areas.Admin.DTO;
 using ShopCake.Models;
 using ShopCake.Unity;
 
@@ -23,7 +24,7 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Admin/Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.ToListAsync());
+            return View(await _context.Categories.OrderBy(c => c.DisplayOrder).ToListAsync());
         }
 
         // GET: Admin/Categories/Details/5
@@ -70,6 +71,15 @@ namespace ShopCake.Areas.Admin.Controllers
                 // Nếu không có thông tin người dùng trong session, trả về lỗi hoặc redirect.
                 return RedirectToAction("Login", "User");
             }
+            if (int.TryParse(category.Name, out _))
+            {
+                ModelState.AddModelError("Name", "Tên danh mục không được là số.");
+            }
+            // Kiểm tra các điều kiện khác nếu cần
+            if (_context.Categories.Any(c => c.Name == category.Name))
+            {
+                ModelState.AddModelError("Name", "Tên danh mục đã tồn tại.");
+            }
 
             // Kiểm tra tính hợp lệ của model
             if (ModelState.IsValid)
@@ -104,19 +114,44 @@ namespace ShopCake.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromForm] Category category)
+        public async Task<IActionResult> Edit(int id, [FromForm] CategoryDTO categoryDTO)
         {
-            if (id != category.CAT_ID)
+            var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
+
+            if (userInfo == null)
+            {
+                return RedirectToAction("Login", "User", new { area = "Admin" });
+            }
+
+            // Kiểm tra nếu id không hợp lệ
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
             {
                 return NotFound();
             }
 
+            // Kiểm tra dữ liệu tên danh mục
+            if (int.TryParse(categoryDTO.name, out _))
+            {
+                ModelState.AddModelError("Name", "Tên danh mục không được là số.");
+            }
+            // Kiểm tra nếu tên danh mục đã tồn tại
+            if (_context.Categories.Any(c => c.Name == categoryDTO.name && c.CAT_ID != id))
+            {
+                ModelState.AddModelError("Name", "Tên danh mục đã tồn tại.");
+            }
+
             if (ModelState.IsValid)
             {
+                // Chuyển đổi từ DTO sang entity
+                category.Name = categoryDTO.name;
+                category.updatedBy = userInfo.UserName;
+                category.updatedDate = DateTime.Now; // Cập nhật thời gian sửa đổi
+
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    _context.Update(category); // Cập nhật entity
+                    await _context.SaveChangesAsync(); // Lưu thay đổi vào DB
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -129,10 +164,17 @@ namespace ShopCake.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index)); // Quay lại danh sách
             }
-            return View(category);
+
+            return View(categoryDTO); // Trả về View nếu có lỗi
         }
+
+        private bool CategoryExists(int id)
+        {
+            return _context.Categories.Any(e => e.CAT_ID == id);
+        }
+
 
         // GET: Admin/Categories/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -167,9 +209,9 @@ namespace ShopCake.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.CAT_ID == id);
-        }
+        //private bool CategoryExists(int id)
+        //{
+        //    return _context.Categories.Any(e => e.CAT_ID == id);
+        //}
     }
 }

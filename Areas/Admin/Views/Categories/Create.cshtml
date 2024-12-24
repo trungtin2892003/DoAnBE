@@ -38,19 +38,14 @@
                             <span asp-validation-for="DisplayOrder" class="text-danger"></span>
                         </div>
 
-                        <!-- Updated By Field -->
-                        <div class="form-group mb-3">
-                            <label asp-for="updatedBy" class="form-label"></label>
-                            <input asp-for="updatedBy" class="form-control" placeholder="Enter updated by" />
-                            <span asp-validation-for="updatedBy" class="text-danger"></span>
-                        </div>
+                 
 
                         <!-- Buttons -->
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-warning me-2">
                                 <i class="fas fa-save"></i> Create
                             </button>
-                            <a asp-controller="Category" asp-action="Index" class="btn btn-secondary">
+                            <a asp-controller="Categories" asp-action="Index" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to List
                             </a>
                         </div>

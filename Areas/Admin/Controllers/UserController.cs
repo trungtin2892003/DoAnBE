@@ -1,10 +1,9 @@
 ﻿using ShopCake.Areas.Admin.DTO;
 using ShopCake.Models;
-using ShopCake.Unity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using ShopCake.Unity;
 
 namespace ShopCake.Areas.Admin.Controllers
 {
@@ -16,35 +15,24 @@ namespace ShopCake.Areas.Admin.Controllers
         public UserController(CakeShopContext context)
         {
             _context = context;
+        }
 
-        }
-        public IActionResult Index()
-        {
-            return View();
-        }
-        // Action để xử lý Sign Out
-        public IActionResult Logout()
-        {
-            // Xóa thông tin session của người dùng
-            HttpContext.Session.Clear();
-
-            // Chuyển hướng về trang Login
-            return RedirectToAction("Login", "User");
-        }
+        // GET: Login page
+        [HttpGet]
         public IActionResult Login()
         {
-            // Đọc LoginDTO từ Cookie
+            // Kiểm tra cookie để tự động đăng nhập
             var cookie = Request.Cookies["UserCredential"];
             if (!string.IsNullOrEmpty(cookie))
             {
                 var login = JsonSerializer.Deserialize<LoginDTO>(cookie);
                 var result = _context.AdminUsers.AsNoTracking()
-                    .FirstOrDefault(x => x.UserName.ToString() == login.Username &&
-                                         x.Password.ToString() == login.Password);
-
+                    .FirstOrDefault(x => x.UserName == login.Username &&
+                                         x.Password == login.Password); // Chưa hash
 
                 if (result != null)
                 {
+                    // Lưu thông tin người dùng vào session
                     HttpContext.Session.Set("userInfo", result);
                     return RedirectToAction("Index", "Home");
                 }
@@ -52,36 +40,59 @@ namespace ShopCake.Areas.Admin.Controllers
             return View();
         }
 
+        // POST: Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginDTO login)
+        public async Task<IActionResult> Login(LoginDTO login)
         {
+            // Kiểm tra thông tin đăng nhập trong database
             var result = await _context.AdminUsers
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserName.ToString() == login.Username && x.Password.ToString() == login.Password);
-            Console.WriteLine(result?.UserName);
+                .FirstOrDefaultAsync(x => x.UserName == login.Username &&
+                                          x.Password == login.Password); // Chưa hash
+
             if (result != null)
             {
-                // Serialize AdminUser và lưu vào Session
+                // Lưu thông tin người dùng vào session
                 HttpContext.Session.Set("userInfo", result);
 
-                // Serialize LoginDTO và lưu vào Cookie
+                // Lưu thông tin đăng nhập vào cookie
                 var cookieValue = JsonSerializer.Serialize(login);
                 Response.Cookies.Append("UserCredential", cookieValue, new CookieOptions
                 {
                     Expires = DateTimeOffset.UtcNow.AddDays(7),
-                    HttpOnly = true, // Tăng cường bảo mật
-                    Secure = true
+                    HttpOnly = true,
+                    Secure = true // Chỉ hoạt động trên HTTPS
                 });
 
+                // Chuyển hướng về trang Index
                 return RedirectToAction("Index", "Home");
             }
-            else
-            {
-                ViewData["Message"] = "Wrong username or password";
-            }
+
+            // Nếu sai thông tin, hiển thị thông báo
+            ViewData["Message"] = "Wrong username or password";
             return View();
         }
 
+        // POST: Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            // Xóa thông tin session của người dùng
+            HttpContext.Session.Clear();
+
+            // Xóa cookie đăng nhập
+            Response.Cookies.Delete("UserCredential");
+
+            // Chuyển hướng về trang Login
+            return RedirectToAction("Login","User");
+        }
+
+        // GET: Index
+        public IActionResult Index()
+        {
+            return View();
+        }
     }
 }
