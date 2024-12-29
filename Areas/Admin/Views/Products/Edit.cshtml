@@ -1,99 +1,120 @@
-﻿@model ShopCake.Models.Product
+﻿ @model ShopCake.Models.Product  
+@*  @model ShopCake.Areas.Admin.DTO.ProductDTO *@
 
 @{
     ViewData["Title"] = "Edit Product";
 }
 
-
-
-<div class="container">
+<div class="container mt-5">
+    <!-- Form Container -->
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <form asp-action="Edit" method="post" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                <input type="hidden" asp-for="PRO_ID" />
-
-                <!-- Category -->
-                <div class="mb-3">
-                    <label asp-for="CAT_ID" class="form-label fw-bold">Category</label>
-                    <select asp-for="CAT_ID" class="form-select" asp-items="ViewBag.CAT_ID">
-                        <option value="">-- Select Category --</option>
-                    </select>
-                    <span asp-validation-for="CAT_ID" class="text-danger"></span>
+            <div class="card shadow-lg">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0">Edit Product</h5>
                 </div>
+                <div class="card-body">
+                    <form asp-action="Edit" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <!-- Avatar -->
-                <!-- Khu vực hiển thị hình ảnh xem trước -->
-                <div class="form-group">
-                    <img id="imagePreview"
-                         src="@(!string.IsNullOrEmpty(Model.Avatar) ? Url.Content("~/Data/Product/" + Model.Avatar) : "#")"
-                         alt="Preview"
-                         style="max-width: 200px; max-height: 200px; display: @(string.IsNullOrEmpty(Model.Avatar) ? "none" : "block"); margin-top: 10px;" />
+                        <!-- Hidden Input for Product ID -->
+                        <input type="hidden" asp-for="PRO_ID" />
+
+                        <!-- Category Select -->
+                        <div class="form-group">
+                            <label asp-for="CAT_ID" class="control-label"></label>
+                            <select asp-for="CAT_ID" class="form-control" asp-items="ViewBag.CAT_ID"></select>
+                            <span asp-validation-for="CAT_ID" class="text-danger"></span>
+                        </div>
+
+                        <!-- Avatar Upload -->
+                        <div class="form-group">
+                            <label asp-for="Avatar" class="control-label">Product Image</label>
+                            <input asp-for="Avatar" class="form-control" type="text" accept="image/*" onchange="previewImage(event)" />
+                            <span asp-validation-for="Avatar" class="text-danger"></span>
+                        </div>
+
+                       
+
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" type="text" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label asp-for="Quantity" class="control-label"></label>
+                            <input asp-for="Quantity" class="form-control" type="number" min="0" max="500" required oninput="validatePrice(this)" />
+                            <span asp-validation-for="Quantity" class="text-danger"></span>
+                        </div>
+
+                        <!-- Intro -->
+                        <div class="form-group">
+                            <label asp-for="Intro" class="control-label"></label>
+                            <input asp-for="Intro" class="form-control" />
+                            <span asp-validation-for="Intro" class="text-danger"></span>
+                        </div>
+
+                        <!-- Price -->
+                        <div class="form-group col-md-2">
+                            <label asp-for="Price" class="control-label"></label>
+                            <input asp-for="Price" class="form-control" type="number" min="0" max="1000" required oninput="validatePrice(this)" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                        <span id="error-message" style="color: red; font-size: 12px;"></span>
+                        <!-- Discount Price -->
+                        <div class="form-group col-md-2">
+                            <label asp-for="DiscountPrice" class="control-label"></label>
+                            <input asp-for="DiscountPrice" class="form-control" type="number" min="0" max="1000" required oninput="validatePrice(this)" />
+                            <span asp-validation-for="DiscountPrice" class="text-danger"></span>
+                        </div>
+                        <span id="error-message" style="color: red; font-size: 12px;"></span>
+                        <!-- Unit -->
+                        <div class="form-group">
+                            <label asp-for="Unit" class="control-label"></label>
+                            <select asp-for="Unit" class="form-control">
+                                <option value="Hộp">Hộp</option>
+                                <option value="Combo 3">Combo 3</option>
+                                <option value="Cỡ lớn">Cỡ lớn</option>
+                                <option value="Cỡ nhỏ">Cỡ nhỏ</option>
+                            </select>
+                            <span asp-validation-for="Unit" class="text-danger"></span>
+                        </div>
+
+                        <!-- Rate -->
+                        <div class="form-group col-md-2">
+                            <label asp-for="Rate" class="control-label"></label>
+                            <select asp-for="Rate" class="form-control">
+                                <option value="1">1 Star</option>
+                                <option value="2">2 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="5">5 Stars</option>
+                            </select>
+                            <span asp-validation-for="Rate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="control-label"></label>
+                            <textarea asp-for="Description" id="Description" class="form-control"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-warning me-2">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </form>
+
+
                 </div>
-
-
-                <!-- Khu vực hiển thị hình ảnh xem trước -->
-                <div class="form-group">
-                    <img id="imagePreview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;" />
-                </div>
-                <!-- Name -->
-                <div class="mb-3">
-                    <label asp-for="Name" class="form-label fw-bold">Product Name</label>
-                    <input asp-for="Name" class="form-control" placeholder="Enter product name" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-
-                <!-- Intro -->
-                <div class="mb-3">
-                    <label asp-for="Intro" class="form-label fw-bold">Introduction</label>
-                    <textarea asp-for="Intro" class="form-control" rows="3" placeholder="Short product description"></textarea>
-                    <span asp-validation-for="Intro" class="text-danger"></span>
-                </div>
-
-                <!-- Price -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Price" class="form-label fw-bold">Price</label>
-                        <input asp-for="Price" class="form-control" type="number" step="0.01" placeholder="Enter price" />
-                        <span asp-validation-for="Price" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="DiscountPrice" class="form-label fw-bold">Discount Price</label>
-                        <input asp-for="DiscountPrice" class="form-control" type="number" step="0.01" placeholder="Enter discount price" />
-                        <span asp-validation-for="DiscountPrice" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <!-- Unit and Rate -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Unit" class="form-label fw-bold">Unit</label>
-                        <input asp-for="Unit" class="form-control" placeholder="e.g., kg, piece" />
-                        <span asp-validation-for="Unit" class="text-danger"></span>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label asp-for="Rate" class="form-label fw-bold">Rate</label>
-                        <input asp-for="Rate" class="form-control" type="number" step="0.1" placeholder="Enter rating" />
-                        <span asp-validation-for="Rate" class="text-danger"></span>
-                    </div>
-                </div>
-
-                <!-- Description -->
-                <div class="form-group">
-                    <label asp-for="Description" class="control-label"></label>
-                    <textarea asp-for="Description" id="Description" class="form-control"></textarea>
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-
-                <!-- Details -->
-            
-
-                <!-- Buttons -->
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-warning px-4">Save</button>
-                    <a asp-action="Index" class="btn btn-secondary px-4">Back to List</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -101,10 +122,26 @@
 @section Header {
     <link rel="stylesheet" href="~/Admin/plugins/ckeditor5/ckeditor5.css">
 }
+
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script>
+        function validatePrice(input) {
+            const errorMessage = document.getElementById("error-message");
+
+            if (input.value > 1000) {
+                errorMessage.textContent = "Yêu cầu nhập < 1000!";
+                input.value = 1000;
+            } else if (input.value < 0) {
+                errorMessage.textContent = "Yêu cầu nhập giá trị > 0!";
+                input.value = 1;
+            } else {
+                errorMessage.textContent = ""; // Xóa lỗi nếu giá trị hợp lệ
+            }
+        }
+    </script>
     <script type="importmap">
         {
             "imports": {
@@ -162,5 +199,7 @@
         }
     </script>
 
+    <partial name="_ValidationScriptsPartial" />
+}
 
 }

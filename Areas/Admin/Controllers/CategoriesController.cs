@@ -145,6 +145,7 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 // Chuyển đổi từ DTO sang entity
                 category.Name = categoryDTO.name;
+                category.DisplayOrder = categoryDTO.DisplayOrder;
                 category.updatedBy = userInfo.UserName;
                 category.updatedDate = DateTime.Now; // Cập nhật thời gian sửa đổi
 
@@ -195,23 +196,34 @@ namespace ShopCake.Areas.Admin.Controllers
         }
 
         // POST: Admin/Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public IActionResult Delete(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            // Kiểm tra danh mục có tồn tại không
+            var category = _context.Categories.FirstOrDefault(c => c.CAT_ID == id);
+            if (category == null)
             {
-                _context.Categories.Remove(category);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            // Kiểm tra xem danh mục có sản phẩm nào không
+            var hasProducts = _context.Products.Any(p => p.CAT_ID == id); // Thay `CategoryId` bằng tên khóa ngoại tương ứng
+            if (hasProducts)
+            {
+                TempData["ErrorMessage"] = "Cannot delete this category because it has associated products.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // Xóa danh mục
+            _context.Categories.Remove(category);
+            _context.SaveChanges();
+
+            TempData["SuccessMessage"] = "Category deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
 
-        //private bool CategoryExists(int id)
-        //{
-        //    return _context.Categories.Any(e => e.CAT_ID == id);
-        //}
+
+        
     }
 }

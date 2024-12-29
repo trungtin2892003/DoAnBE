@@ -8,7 +8,8 @@ namespace ShopCake.Models
     {
         [Key]
         public int CARD_ID { get; set; } // Mã chi tiết giỏ hàng
-
+        public string? ProductName { get; set; }
+        public string?   ProductImage { get; set; }
         [Required]
         public int CAR_ID { get; set; } // Mã giỏ hàng
 
@@ -21,7 +22,11 @@ namespace ShopCake.Models
 
         [Required]
         public decimal Price { get; set; } // Giá sản phẩm
-
+        public decimal Total
+        {
+            get => Quantity * Price;
+            set { } // Thêm setter rỗng (nếu cần gán)
+        }
         public decimal? DiscountPrice { get; set; } // Giá sau giảm giá (nullable)
 
         [ForeignKey("CAR_ID")]

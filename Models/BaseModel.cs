@@ -6,12 +6,12 @@ namespace ShopCake.Models
     {
         [DisplayName("Created date")]
         public DateTime CreatedDate { get; set; } = DateTime.Now;
-        [DisplayName("Create By")]
+        [DisplayName("Người tạo")]
         public string? createdBy { get; set; }
 
         [DisplayName("Updated date")]
         public DateTime updatedDate { get; set; } = DateTime.Now;
-        [DisplayName("Updated By")]
+        [DisplayName("Người cập nhật")]
         public string? updatedBy { get; set; }
     }
 }

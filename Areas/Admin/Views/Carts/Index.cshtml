@@ -35,10 +35,7 @@
                                 <th>@Html.DisplayNameFor(model => model.Discount)</th>
                                 <th>@Html.DisplayNameFor(model => model.PaymentMethod)</th>
                                 <th>@Html.DisplayNameFor(model => model.Note)</th>
-                                <th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
-                                <th>@Html.DisplayNameFor(model => model.CreatedBy)</th>
-                                <th>@Html.DisplayNameFor(model => model.UpdatedDate)</th>
-                                <th>@Html.DisplayNameFor(model => model.UpdatedBy)</th>
+                                
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -58,9 +55,7 @@
                                     <td>@Html.DisplayFor(modelItem => item.PaymentMethod)</td>
                                     <td>@Html.DisplayFor(modelItem => item.Note)</td>
                                     <td>@Html.DisplayFor(modelItem => item.CreatedDate)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.CreatedBy)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.UpdatedDate)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.UpdatedBy)</td>
+                                   
                                     <td>
                                         <a class="btn btn-warning btn-sm" asp-action="Edit" asp-route-id="@item.CAR_ID">Edit</a>
                                         <a class="btn btn-danger btn-sm" asp-action="Delete" asp-route-id="@item.CAR_ID" onclick="return confirm('Are you sure you want to delete?')">Delete</a>

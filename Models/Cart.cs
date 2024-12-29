@@ -12,21 +12,15 @@ namespace ShopCake.Models
         public int USE_ID { get; set; }
         public int MEM_ID { get; set; }
         public DateTime CartDate { get; set; }
-        public string CustomerName { get; set; }
-        public string Phone { get; set; }
-        public string Address { get; set; }
+        public string? CustomerName { get; set; }
+        public string? Phone { get; set; }
+        public string? Address { get; set; }
         public decimal TotalPrice { get; set; }
         public decimal Discount { get; set; }
-        public string PaymentMethod { get; set; }
-        public string Note { get; set; }
-        public string Status { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime UpdatedDate { get; set; }
-        public string UpdatedBy { get; set; }
-
-
-
+        public string? PaymentMethod { get; set; }
+        public string? Note { get; set; }
+        public string? Status { get; set; }
+ 
         // Quan hệ với các bảng khác
         [ForeignKey("USE_ID")]
         public virtual Order? User { get; set; } // Quan hệ với bảng Users

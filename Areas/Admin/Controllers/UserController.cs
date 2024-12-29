@@ -92,7 +92,14 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Index
         public IActionResult Index()
         {
+            // Lấy tên người dùng từ session
+            var userName = HttpContext.Session.GetString("UserName");
+
+            // Chuyển dữ liệu vào View
+            ViewBag.UserName = userName;
+
             return View();
         }
+
     }
 }

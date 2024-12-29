@@ -5,5 +5,6 @@ namespace ShopCake.Areas.Admin.DTO
     public class CategoryDTO :BaseModel
     {
         public string name { get; set;}
+        public int DisplayOrder { get; set; }
     }
 }

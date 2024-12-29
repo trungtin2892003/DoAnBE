@@ -18,11 +18,16 @@ namespace ShopCake.Controllers
         public IActionResult Index()
         {
             ViewData["Categories"] = _context.Categories.AsNoTracking()
-                .Include(x => x.Products!.OrderBy(y => y.Name))
-                .OrderBy(c => c.DisplayOrder).ToList();
+               .OrderBy(c => c.DisplayOrder)  
+               .Include(x => x.Products)  
+               .ToList();  
+
+         
             ViewData["HotProduct"] = _context.Products.AsNoTracking()
-               .Include(x => x.Category)
-               .OrderBy(x => x.Price).ToList();
+               .Include(x => x.Category)  // T?i Category c?a m?i s?n ph?m
+               .OrderBy(x => x.Price)  // S?p x?p s?n ph?m theo giá
+              .ToList();  // L?y danh sách s?n ph?m sau khi s?p x?p
+
             return View();
         }
         public IActionResult Contact()
