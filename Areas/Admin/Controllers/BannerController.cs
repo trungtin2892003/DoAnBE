@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopCake.Areas.Admin.DTO;
 using ShopCake.Models;
@@ -8,10 +9,12 @@ using System.IO;
 namespace ShopCake.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin")]
     public class BannerController : Controller
     {
         private readonly CakeShopContext _context;
         private readonly IWebHostEnvironment _hostEnv;
+        private const string BannerFolderName = "BannerImg";
 
         public BannerController(CakeShopContext context, IWebHostEnvironment hostEnv)
         {
@@ -22,17 +25,25 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Admin/Banner
         public async Task<IActionResult> Index()
         {
-            var banners = await _context.Banners.ToListAsync();
+            var banners = await _context.Banners.AsNoTracking().ToListAsync();
             return View(banners);
         }
 
         // GET: Admin/Banner/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "ID không hợp lệ.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            var banner = await _context.Banners.FindAsync(id);
-            if (banner == null) return NotFound();
+            var banner = await _context.Banners.AsNoTracking().FirstOrDefaultAsync(b => b.BAN_ID == id);
+            if (banner == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy banner.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(banner);
         }
@@ -54,45 +65,54 @@ namespace ShopCake.Areas.Admin.Controllers
                 return RedirectToAction("Login", "User");
             }
 
+            if (!ModelState.IsValid || banner.Image == null || banner.Image.Length == 0)
+            {
+                ModelState.AddModelError("Image", "Ảnh không được để trống.");
+                return View(banner);
+            }
+
             var newBanner = new Banner
             {
                 BAN_ID = banner.BAN_ID,
-                Url = banner.Url,
                 Title = banner.Title,
+                Url = banner.Url,
                 createdBy = userInfo.UserName,
-                updatedBy = userInfo.UserName,
+                updatedBy = userInfo.UserName
             };
 
-            if (ModelState.IsValid)
+            try
             {
-                string? newImageFileName = null;
-
-                if (banner.Image != null && banner.Image.Length > 0)
-                {
-                    newImageFileName = await SaveImageAsync(banner.Image, "Banner");
-                }
-
-                if (newImageFileName != null)
-                {
-                    newBanner.Image = newImageFileName;
-                }
+                string newImageFileName = await SaveImageAsync(banner.Image);
+                newBanner.Image = newImageFileName;
 
                 _context.Add(newBanner);
                 await _context.SaveChangesAsync();
 
+                TempData["SuccessMessage"] = "Thêm banner thành công.";
                 return RedirectToAction(nameof(Index));
             }
-
-            return View(banner);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Lỗi xảy ra khi lưu dữ liệu: {ex.Message}");
+                return View(banner);
+            }
         }
 
         // GET: Admin/Banner/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "ID không hợp lệ.";
+                return RedirectToAction(nameof(Index));
+            }
 
             var banner = await _context.Banners.FindAsync(id);
-            if (banner == null) return NotFound();
+            if (banner == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy banner.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(banner);
         }
@@ -102,9 +122,17 @@ namespace ShopCake.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [FromForm] Banner banner, IFormFile? imageFile)
         {
-            if (id != banner.BAN_ID) return NotFound();
+            if (id != banner.BAN_ID)
+            {
+                TempData["ErrorMessage"] = "ID không khớp.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            if (!ModelState.IsValid) return View(banner);
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Thông tin không hợp lệ. Vui lòng kiểm tra lại.";
+                return View(banner);
+            }
 
             try
             {
@@ -112,31 +140,50 @@ namespace ShopCake.Areas.Admin.Controllers
                 {
                     if (!string.IsNullOrEmpty(banner.Image))
                     {
-                        DeleteImage(banner.Image, "Banner");
+                        DeleteImage(banner.Image);
                     }
 
-                    banner.Image = await SaveImageAsync(imageFile, "Banner");
+                    banner.Image = await SaveImageAsync(imageFile);
                 }
 
                 _context.Update(banner);
                 await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Cập nhật banner thành công.";
+                return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BannerExists(banner.BAN_ID)) return NotFound();
+                if (!BannerExists(banner.BAN_ID))
+                {
+                    TempData["ErrorMessage"] = "Banner không tồn tại.";
+                    return RedirectToAction(nameof(Index));
+                }
+
                 throw;
             }
-
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Lỗi xảy ra khi cập nhật: {ex.Message}");
+                return View(banner);
+            }
         }
 
         // GET: Admin/Banner/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "ID không hợp lệ.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            var banner = await _context.Banners.FindAsync(id);
-            if (banner == null) return NotFound();
+            var banner = await _context.Banners.AsNoTracking().FirstOrDefaultAsync(b => b.BAN_ID == id);
+            if (banner == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy banner.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(banner);
         }
@@ -150,13 +197,26 @@ namespace ShopCake.Areas.Admin.Controllers
 
             if (banner != null)
             {
-                if (!string.IsNullOrEmpty(banner.Image))
+                try
                 {
-                    DeleteImage(banner.Image, "Banner");
-                }
+                    if (!string.IsNullOrEmpty(banner.Image))
+                    {
+                        DeleteImage(banner.Image);
+                    }
 
-                _context.Banners.Remove(banner);
-                await _context.SaveChangesAsync();
+                    _context.Banners.Remove(banner);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Xóa banner thành công.";
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"Lỗi xảy ra khi xóa banner: {ex.Message}";
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy banner cần xóa.";
             }
 
             return RedirectToAction(nameof(Index));
@@ -167,9 +227,9 @@ namespace ShopCake.Areas.Admin.Controllers
             return _context.Banners.Any(e => e.BAN_ID == id);
         }
 
-        private async Task<string> SaveImageAsync(IFormFile imageFile, string folderName)
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
         {
-            var folderPath = Path.Combine(_hostEnv.WebRootPath, "Data", folderName);
+            var folderPath = Path.Combine(_hostEnv.WebRootPath, "Data", BannerFolderName);
 
             if (!Directory.Exists(folderPath))
             {
@@ -179,17 +239,15 @@ namespace ShopCake.Areas.Admin.Controllers
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(imageFile.FileName)}";
             var filePath = Path.Combine(folderPath, fileName);
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
+            await using var fileStream = new FileStream(filePath, FileMode.Create);
+            await imageFile.CopyToAsync(fileStream);
 
             return fileName;
         }
 
-        private void DeleteImage(string fileName, string folderName)
+        private void DeleteImage(string fileName)
         {
-            var filePath = Path.Combine(_hostEnv.WebRootPath, "Data", folderName, fileName);
+            var filePath = Path.Combine(_hostEnv.WebRootPath, "Data", BannerFolderName, fileName);
 
             if (System.IO.File.Exists(filePath))
             {

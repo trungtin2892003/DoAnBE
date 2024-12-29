@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\Admin\Data\Product\" />
+    <Folder Include="wwwroot\Data\BannerImg\" />
     <Folder Include="wwwroot\Data\Team\" />
   </ItemGroup>
 
