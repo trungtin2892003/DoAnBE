@@ -121,8 +121,10 @@ namespace ShopCake.Areas.Admin.Controllers
                 Rate = request.Rate,
                 Description = request.Description,
                 Details = request.Details,
-                createdBy = userInfo.DisplayName,
-                updatedBy = userInfo.DisplayName,
+                createdBy = userInfo.UserName,
+                updatedBy = userInfo.UserName
+                //createdBy = userInfo.DisplayName,
+                //updatedBy = userInfo.DisplayName,
             };
 
             // Xử lý lưu ảnh
@@ -189,41 +191,69 @@ namespace ShopCake.Areas.Admin.Controllers
                 return RedirectToAction("Login", "User", new { area = "Admin" });
             }
 
-            // Kiểm tra nếu id không khớp với sản phẩm được chỉnh sửa
             if (id != productDTO.PRO_ID)
             {
                 return NotFound();
             }
-            // Lấy sản phẩm hiện tại từ database
+
             var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             if (ModelState.IsValid)
             {
-               
-
-                if (product == null)
-                {
-                    return NotFound(); // Nếu không tìm thấy sản phẩm
-                }
-
-                // Cập nhật thông tin sản phẩm từ ProductDTO
-                product.Name = productDTO.Name;
-                product.Price = productDTO.Price;
-                product.Quantity = productDTO.Quantity;
-                product.Unit = productDTO.Unit;
-                product.Intro = productDTO.Intro;
-                product.DiscountPrice = productDTO.DiscountPrice;
-                product.Rate = productDTO.Rate;
-                product.Description = productDTO.Description;
-                product.CAT_ID = productDTO.CAT_ID;
-
-                // Chỉ cập nhật updatedBy, giữ nguyên createdBy
-                product.updatedBy = userInfo.DisplayName;
-                product.updatedDate = DateTime.Now;
-
                 try
                 {
-                    _context.Update(product); // Cập nhật entity
-                    await _context.SaveChangesAsync(); // Lưu thay đổi vào DB
+                    // Cập nhật thông tin cơ bản
+                    product.Name = productDTO.Name;
+                    product.Price = productDTO.Price;
+                    product.Quantity = productDTO.Quantity;
+                    product.Unit = productDTO.Unit;
+                    product.Intro = productDTO.Intro;
+                    product.DiscountPrice = productDTO.DiscountPrice;
+                    product.Rate = productDTO.Rate;
+                    product.Description = productDTO.Description;
+                    product.CAT_ID = productDTO.CAT_ID;
+                    product.updatedBy = userInfo.UserName;
+                    product.updatedDate = DateTime.Now;
+
+                    // Xử lý avatar mới nếu được tải lên
+                    if (productDTO.Avatar != null && productDTO.Avatar.Length > 0)
+                    {
+                        var folderPath = Path.Combine(_hostEnv.WebRootPath, "Data", "Product");
+
+                        if (!Directory.Exists(folderPath))
+                        {
+                            Directory.CreateDirectory(folderPath);
+                        }
+
+                        // Xóa avatar cũ nếu tồn tại
+                        if (!string.IsNullOrEmpty(product.Avatar))
+                        {
+                            var oldImagePath = Path.Combine(folderPath, product.Avatar);
+                            if (System.IO.File.Exists(oldImagePath))
+                            {
+                                System.IO.File.Delete(oldImagePath);
+                            }
+                        }
+
+                        // Lưu avatar mới
+                        var extension = Path.GetExtension(productDTO.Avatar.FileName);
+                        var newImageFileName = $"{Guid.NewGuid()}{extension}";
+                        var filePath = Path.Combine(folderPath, newImageFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await productDTO.Avatar.CopyToAsync(fileStream);
+                        }
+
+                        product.Avatar = newImageFileName; // Cập nhật tên file mới
+                    }
+
+                    _context.Update(product);
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -236,15 +266,16 @@ namespace ShopCake.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index)); // Quay lại danh sách sản phẩm
+
+                return RedirectToAction(nameof(Index));
             }
 
-            // Nếu ModelState không hợp lệ, trả lại view với danh sách categories
-            ViewData["CAT_ID"] = new SelectList(_context.Categories, "CAT_ID", "CAT_ID", productDTO.CAT_ID);
+            ViewData["CAT_ID"] = new SelectList(_context.Categories, "CAT_ID", "Name", productDTO.CAT_ID);
             return View(productDTO);
         }
 
-        
+
+
 
         // GET: Admin/Products/Delete/5
         public async Task<IActionResult> Delete(int? id)

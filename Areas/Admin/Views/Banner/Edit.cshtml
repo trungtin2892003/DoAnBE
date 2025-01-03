@@ -1,4 +1,4 @@
-﻿@model ShopCake.Models.Banner
+﻿@model ShopCake.Areas.Admin.DTO.BannerDTO
 
 @{
     ViewData["Title"] = "Create Banner";
@@ -6,7 +6,7 @@
 
 <div class="row justify-content-center">
     <div class="col-md-8">
-        <form asp-action="Edit" class="border p-4 rounded shadow-sm bg-light">
+        <form asp-action="Edit" class="border p-4 rounded shadow-sm bg-light" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
             <input type="hidden" asp-for="BAN_ID" />
 
@@ -25,16 +25,21 @@
                 </div>
             </div>
 
-            <!-- Image Input with Preview -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="Image" class="form-label fw-bold">Image</label>
-                    <input asp-for="Image" type="file" class="form-control" onchange="previewImage(event)" />
-                    <span asp-validation-for="Image" class="text-danger"></span>
-
-                    <!-- Image Preview -->
-                    <img id="imagePreview" src="" alt="Image Preview" style="display:none; max-width: 100%; margin-top: 10px;" />
+            <!-- Image Input -->
+            <div class="form-group">
+                <label asp-for="Image" class="control-label">Current Avatar</label>
+                 <!-- Hiển thị ảnh đại diện cũ -->
+                <div>
+                    <img src="~/Data/BannerImg/@Model.Image" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
                 </div>
+                <!-- Input để chọn ảnh mới -->
+                <div class="form-group">
+                    <label>New Avatar Preview</label>
+                    <img id="image-preview" src="~/Data/BannerImg/@Model.Image" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
+                    @*  <img id="image-preview" src="" alt="New Avatar Preview" style="max-width: 200px; height: auto; display: none; margin-top: 10px;" /> *@
+                </div>
+                <input asp-for="Image" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
+                <span asp-validation-for="Image" class="text-danger"></span>
             </div>
 
             <!-- URL Input -->
@@ -46,34 +51,6 @@
                 </div>
             </div>
 
-            <!-- Created Date & Created By Inputs (Read-Only) -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label asp-for="CreatedDate" class="form-label fw-bold">Created Date</label>
-                    <input asp-for="CreatedDate" class="form-control" readonly />
-                    <span asp-validation-for="CreatedDate" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="createdBy" class="form-label fw-bold">Created By</label>
-                    <input asp-for="createdBy" class="form-control" readonly />
-                    <span asp-validation-for="createdBy" class="text-danger"></span>
-                </div>
-            </div>
-
-            <!-- Updated Date & Updated By Inputs -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label asp-for="updatedDate" class="form-label fw-bold">Updated Date</label>
-                    <input asp-for="updatedDate" class="form-control" />
-                    <span asp-validation-for="updatedDate" class="text-danger"></span>
-                </div>
-                <div class="col-md-6">
-                    <label asp-for="updatedBy" class="form-label fw-bold">Updated By</label>
-                    <input asp-for="updatedBy" class="form-control" />
-                    <span asp-validation-for="updatedBy" class="text-danger"></span>
-                </div>
-            </div>
-
             <!-- Submit Button -->
             <div class="d-flex justify-content-between">
                 <button type="submit" class="btn btn-primary px-4">Save</button>
@@ -82,7 +59,6 @@
         </form>
     </div>
 </div>
-
 
 @section Header {
     <link rel="stylesheet" href="~/Admin/plugins/ckeditor5/ckeditor5.css">
@@ -136,4 +112,22 @@
             }
         }
     </script>
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('image-preview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+
 }

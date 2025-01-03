@@ -9,13 +9,14 @@ using System.IO;
 namespace ShopCake.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class BannerController : Controller
     {
         private readonly CakeShopContext _context;
         private readonly IWebHostEnvironment _hostEnv;
         private const string BannerFolderName = "BannerImg";
 
+       
         public BannerController(CakeShopContext context, IWebHostEnvironment hostEnv)
         {
             _context = context;
@@ -98,6 +99,7 @@ namespace ShopCake.Areas.Admin.Controllers
             }
         }
 
+       
         // GET: Admin/Banner/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -114,15 +116,23 @@ namespace ShopCake.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return View(banner);
-        }
+            // Map Banner to BannerDTO
+            var bannerDto = new BannerDTO
+            {
+                BAN_ID = banner.BAN_ID,
+                Title = banner.Title,
+                Url = banner.Url,
+                DisplayOrder = banner.DisplayOrder
+            };
 
+            return View(bannerDto);
+        }
         // POST: Admin/Banner/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromForm] Banner banner, IFormFile? imageFile)
+        public async Task<IActionResult> Edit(int id, [FromForm] BannerDTO bannerDto)
         {
-            if (id != banner.BAN_ID)
+            if (id != bannerDto.BAN_ID)
             {
                 TempData["ErrorMessage"] = "ID không khớp.";
                 return RedirectToAction(nameof(Index));
@@ -131,22 +141,36 @@ namespace ShopCake.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 TempData["ErrorMessage"] = "Thông tin không hợp lệ. Vui lòng kiểm tra lại.";
-                return View(banner);
+                return View(bannerDto);
+            }
+
+            var existingBanner = await _context.Banners.FindAsync(id);
+            if (existingBanner == null)
+            {
+                TempData["ErrorMessage"] = "Banner không tồn tại.";
+                return RedirectToAction(nameof(Index));
             }
 
             try
             {
-                if (imageFile != null && imageFile.Length > 0)
+                // Map DTO to entity
+                existingBanner.Title = bannerDto.Title;
+                existingBanner.Url = bannerDto.Url;
+                existingBanner.DisplayOrder = bannerDto.DisplayOrder;
+
+                if (bannerDto.Image != null && bannerDto.Image.Length > 0)
                 {
-                    if (!string.IsNullOrEmpty(banner.Image))
+                    // Delete old image if any
+                    if (!string.IsNullOrEmpty(existingBanner.Image))
                     {
-                        DeleteImage(banner.Image);
+                        DeleteImage(existingBanner.Image);
                     }
 
-                    banner.Image = await SaveImageAsync(imageFile);
+                    // Save new image and update path
+                    existingBanner.Image = await SaveImageAsync(bannerDto.Image);
                 }
 
-                _context.Update(banner);
+                _context.Update(existingBanner);
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Cập nhật banner thành công.";
@@ -154,7 +178,7 @@ namespace ShopCake.Areas.Admin.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!BannerExists(banner.BAN_ID))
+                if (!BannerExists(bannerDto.BAN_ID))
                 {
                     TempData["ErrorMessage"] = "Banner không tồn tại.";
                     return RedirectToAction(nameof(Index));
@@ -165,7 +189,7 @@ namespace ShopCake.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError("", $"Lỗi xảy ra khi cập nhật: {ex.Message}");
-                return View(banner);
+                return View(bannerDto);
             }
         }
 

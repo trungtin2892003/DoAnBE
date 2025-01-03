@@ -24,9 +24,18 @@ namespace ShopCake.Areas.Admin.Controllers
         }
 
         // GET: Admin/Team
-        public async Task<IActionResult> Index()
+        public IActionResult Index(string searchString)
         {
-            return View(await _context.Teams.ToListAsync());
+            ViewData["CurrentFilter"] = searchString;
+
+            var teams = _context.Teams.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                teams = teams.Where(t => t.Name.Contains(searchString));
+            }
+
+            return View(teams.ToList());
         }
 
         // GET: Admin/Team/Details/5
@@ -37,8 +46,7 @@ namespace ShopCake.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var team = await _context.Teams
-                .FirstOrDefaultAsync(m => m.TEAM_ID == id);
+            var team = await _context.Teams.FirstOrDefaultAsync(m => m.TEAM_ID == id);
             if (team == null)
             {
                 return NotFound();
@@ -66,7 +74,6 @@ namespace ShopCake.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                // Xử lý thông tin thành viên
                 var team = new Team
                 {
                     TEAM_ID = teamDTO.TEAM_ID,
@@ -74,11 +81,10 @@ namespace ShopCake.Areas.Admin.Controllers
                     Position = teamDTO.Position,
                     FacebookUrl = teamDTO.FacebookUrl,
                     InstagramUrl = teamDTO.InstagramUrl,
-                    createdBy=userInfo.createdBy,
-                    updatedBy=userInfo.updatedBy,
+                    createdBy = userInfo.UserName,
+                    updatedBy = userInfo.UserName,
                 };
 
-                // Lưu ảnh nếu có
                 if (teamDTO.PhotoUrl != null && teamDTO.PhotoUrl.Length > 0)
                 {
                     var folderPath = Path.Combine(_hostEnv.WebRootPath, "Data", "Team");
@@ -96,11 +102,9 @@ namespace ShopCake.Areas.Admin.Controllers
                         await teamDTO.PhotoUrl.CopyToAsync(fileStream);
                     }
 
-                    // Cập nhật đường dẫn ảnh vào cơ sở dữ liệu
                     team.PhotoUrl = newImageFileName;
                 }
 
-                // Thêm thành viên vào cơ sở dữ liệu
                 _context.Add(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -122,6 +126,7 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
             return View(team);
         }
 
@@ -130,7 +135,20 @@ namespace ShopCake.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [FromForm] TeamDTO teamDTO)
         {
+            var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
+
+            if (userInfo == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
             if (id != teamDTO.TEAM_ID)
+            {
+                return NotFound();
+            }
+
+            var team = await _context.Teams.FindAsync(id);
+            if (team == null)
             {
                 return NotFound();
             }
@@ -139,25 +157,28 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 try
                 {
-                    var team = await _context.Teams.FindAsync(id);
-                    if (team == null)
-                    {
-                        return NotFound();
-                    }
-
-                    // Cập nhật thông tin thành viên
                     team.Name = teamDTO.Name;
                     team.Position = teamDTO.Position;
                     team.FacebookUrl = teamDTO.FacebookUrl;
                     team.InstagramUrl = teamDTO.InstagramUrl;
+                    team.updatedBy = userInfo.UserName;
 
-                    // Lưu ảnh nếu có
                     if (teamDTO.PhotoUrl != null && teamDTO.PhotoUrl.Length > 0)
                     {
                         var folderPath = Path.Combine(_hostEnv.WebRootPath, "Data", "Team");
+
                         if (!Directory.Exists(folderPath))
                         {
                             Directory.CreateDirectory(folderPath);
+                        }
+
+                        if (!string.IsNullOrEmpty(team.PhotoUrl))
+                        {
+                            var oldImagePath = Path.Combine(folderPath, team.PhotoUrl);
+                            if (System.IO.File.Exists(oldImagePath))
+                            {
+                                System.IO.File.Delete(oldImagePath);
+                            }
                         }
 
                         var extension = Path.GetExtension(teamDTO.PhotoUrl.FileName);
@@ -169,7 +190,7 @@ namespace ShopCake.Areas.Admin.Controllers
                             await teamDTO.PhotoUrl.CopyToAsync(fileStream);
                         }
 
-                        team.PhotoUrl = newImageFileName; // Cập nhật URL ảnh
+                        team.PhotoUrl = newImageFileName;
                     }
 
                     _context.Update(team);
@@ -186,8 +207,10 @@ namespace ShopCake.Areas.Admin.Controllers
                         throw;
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(teamDTO);
         }
 
@@ -199,8 +222,7 @@ namespace ShopCake.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var team = await _context.Teams
-                .FirstOrDefaultAsync(m => m.TEAM_ID == id);
+            var team = await _context.Teams.FirstOrDefaultAsync(m => m.TEAM_ID == id);
             if (team == null)
             {
                 return NotFound();

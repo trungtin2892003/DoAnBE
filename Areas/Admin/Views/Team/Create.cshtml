@@ -43,7 +43,7 @@
                             <input asp-for="PhotoUrl" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
                             <span asp-validation-for="PhotoUrl" class="text-danger"></span>
                         </div>
-
+                        
                         <!-- Image Preview -->
                         <div class="form-group">
                             <img id="imagePreview" src="#" alt="Preview" style="max-width: 200px; max-height: 200px; display: none; margin-top: 10px;" />
@@ -62,21 +62,21 @@
                         </div>
 
                         <!-- Metadata -->
-                        <div class="form-group">
+                      @*   <div class="form-group">
                             <label asp-for="CreatedDate" class="control-label"></label>
                             <input asp-for="CreatedDate" class="form-control" />
                             <span asp-validation-for="CreatedDate" class="text-danger"></span>
-                        </div>
+                        </div> *@
                         <div class="form-group">
                             <label asp-for="createdBy" class="control-label"></label>
                             <input asp-for="createdBy" class="form-control" />
                             <span asp-validation-for="createdBy" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
+                     @*    <div class="form-group">
                             <label asp-for="updatedDate" class="control-label"></label>
                             <input asp-for="updatedDate" class="form-control" />
                             <span asp-validation-for="updatedDate" class="text-danger"></span>
-                        </div>
+                        </div> *@
                         <div class="form-group">
                             <label asp-for="updatedBy" class="control-label"></label>
                             <input asp-for="updatedBy" class="form-control" />
@@ -163,6 +163,6 @@
             }
         }
     </script>
-
+    <partial name="_ValidationScriptsPartial" />
 
 }

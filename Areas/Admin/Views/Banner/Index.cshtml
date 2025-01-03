@@ -38,7 +38,7 @@
                             <table id="tbl" class="table table-bordered table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>Image</th>
+                                        <th>@Html.DisplayNameFor(model => model.Image)</th>
                                         <th>@Html.DisplayNameFor(model => model.Title)</th>
                                         <th>@Html.DisplayNameFor(model => model.Url)</th>
                                         <th>@Html.DisplayNameFor(model => model.DisplayOrder)</th>
@@ -54,7 +54,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                <img src="~/Data/Banner/@item.Image" alt="Banner Image" style="max-width: 100px; max-height: 100px;" />
+                                                <img src="~/Data/BannerImg/@item.Image" alt="Banner Image" style="max-width: 100px; max-height: 100px;" />
                                             </td>
                                             <td>@Html.DisplayFor(modelItem => item.Title)</td>
                                             <td>@Html.DisplayFor(modelItem => item.Url)</td>
