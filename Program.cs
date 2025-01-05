@@ -1,5 +1,6 @@
 ﻿using ShopCake.Models;
 using Microsoft.EntityFrameworkCore;
+using ShopCake.Controllers;
 
 namespace ShopCake
 {
@@ -8,7 +9,11 @@ namespace ShopCake
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            builder.Logging.ClearProviders();  // Xóa các nhà cung cấp logging mặc định nếu cần
+            builder.Logging.AddConsole();      // Thêm log vào console (mặc định)
+            builder.Logging.AddDebug();
+            // Thêm dịch vụ vào container DI
+            builder.Services.AddScoped<CartService>();
             // Đăng ký DbContext
             builder.Services.AddDbContext<CakeShopContext>(opt =>
                 opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

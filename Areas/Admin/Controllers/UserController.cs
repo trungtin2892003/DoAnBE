@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using ShopCake.Unity;
+using Microsoft.AspNetCore.Identity;
+using BCrypt.Net;
+
 
 namespace ShopCake.Areas.Admin.Controllers
 {
@@ -19,8 +22,8 @@ namespace ShopCake.Areas.Admin.Controllers
 
         // GET: Login page
         [HttpGet]
-        public IActionResult Login()
-        {
+            public IActionResult Login()
+            {
             // Kiểm tra cookie để tự động đăng nhập
             var cookie = Request.Cookies["UserCredential"];
             if (!string.IsNullOrEmpty(cookie))
@@ -34,10 +37,61 @@ namespace ShopCake.Areas.Admin.Controllers
                 {
                     // Lưu thông tin người dùng vào session
                     HttpContext.Session.Set("userInfo", result);
+                    // Lưu thông tin người dùng vào session
+                    HttpContext.Session.SetInt32("USE_ID", result.USE_ID);
+                    // Sau khi đăng nhập thành công, chuyển hướng đến trang Home
                     return RedirectToAction("Index", "Home");
                 }
             }
+
+            // Nếu không tìm thấy thông tin người dùng hợp lệ
             return View();
+        }
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterDTO register)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewData["Message"] = "Please fill in all fields correctly.";
+                return View();
+            }
+
+            // Kiểm tra username/email đã tồn tại
+            var existingUser = await _context.AdminUsers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.UserName == register.UserName || x.Email == register.Email);
+
+            if (existingUser != null)
+            {
+                ViewData["Message"] = "Username or Email already exists.";
+                return View();
+            }
+
+            // Tạo user mới
+            var newUser = new AdminUser
+            {
+                UserName = register.UserName,
+                Email = register.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(register.Password), // Mã hóa password
+                DisplayName = register.UserName, // Hoặc gán giá trị phù hợp
+                CreatedDate = DateTime.UtcNow
+            };
+
+
+            _context.AdminUsers.Add(newUser);
+            await _context.SaveChangesAsync();
+
+            // Điều hướng đến trang đăng nhập sau khi đăng ký thành công
+            TempData["Message"] = "Account created successfully. Please login.";
+            return RedirectToAction("Login", "User", new { Area = "Admin" });
+
         }
 
         // POST: Login
@@ -53,6 +107,7 @@ namespace ShopCake.Areas.Admin.Controllers
 
             if (result != null)
             {
+
                 // Lưu thông tin người dùng vào session
                 HttpContext.Session.Set("userInfo", result);
 
@@ -73,6 +128,8 @@ namespace ShopCake.Areas.Admin.Controllers
             ViewData["Message"] = "Wrong username or password";
             return View();
         }
+
+
 
         // POST: Logout
         [HttpPost]

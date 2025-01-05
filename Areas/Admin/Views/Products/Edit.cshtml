@@ -29,10 +29,18 @@
 
                         <!-- Avatar Upload -->
                         <div class="form-group">
-                            <label asp-for="Avatar" class="control-label">Product Image</label>
-                            <input asp-for="Avatar" class="form-control" type="text" accept="image/*" onchange="previewImage(event)" />
+                            <label asp-for="Avatar" class="control-label">Current Avatar</label>
+                     
+                            <!-- Input để chọn ảnh mới -->
+                            <div class="form-group">
+                     
+                                <img id="image-preview" src="~/Data/Product/@Model.Avatar" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
+                                @*  <img id="image-preview" src="" alt="New Avatar Preview" style="max-width: 200px; height: auto; display: none; margin-top: 10px;" /> *@
+                            </div>
+                            <input asp-for="Avatar" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
                             <span asp-validation-for="Avatar" class="text-danger"></span>
                         </div>
+
 
                        
 

@@ -48,8 +48,19 @@
                             </div>
                         </div> <!-- /.col -->
                         <div class="col-4">
-                            <div class="d-grid gap-2"> <button type="submit" class="btn btn-warning">Sign In</button> </div>
-                        </div> <!-- /.col -->
+                            <div class="d-grid "> <a asp-action="Register" asp-controller="User" asp-area="Admin" class="btn btn-warning">Register</a> </div>
+                        </div>
+                        <form method="post" action="/Login">
+                            @Html.AntiForgeryToken()
+                            <!-- Các trường nhập liệu -->
+                            <div class="col-4">
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-warning">Sign In</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- /.col -->
                     </div> <!--end::Row-->
                 </form>
                 <!-- <div class="social-auth-links text-center mb-3 d-grid gap-2">
@@ -89,6 +100,31 @@
             }
         });
         //===================== end::OverlayScrollbars Configure =====================
+
+    </script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (event) {
+            event.preventDefault();  // Ngăn chặn form submit mặc định
+
+            const formData = new FormData(this);
+
+            fetch('/login', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = data.redirectUrl;  // Chuyển hướng sau khi đăng nhập thành công
+                    } else {
+                        alert('Login failed!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+        sessionStorage.getItem("USE_ID");
 
     </script>
 </body>

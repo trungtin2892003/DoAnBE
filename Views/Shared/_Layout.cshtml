@@ -66,7 +66,7 @@
                         <li>ENG</li>
                     </ul>
                 </li>
-                <li><a href="#">Sign in</a> <span class="arrow_carrot-down"></span></li>
+                <li><a asp-area="Admin" asp-controller="User" asp-action="Login">Sign in</a> <span class="arrow_carrot-down"></span></li>
             </ul>
         </div>
     </div>
@@ -94,7 +94,12 @@
                                             <li>ENG</li>
                                         </ul>
                                     </li>
-                                    <li><a href="#">Sign in</a> <span class="arrow_carrot-down"></span></li>
+                                    <li>
+                                        <form asp-controller="User" asp-area="Admin" asp-action="Logout" method="post" style="display:inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-default btn-flat">Sign in</button>
+                                        </form> <span class="arrow_carrot-down"></span>
+                                    </li>
                                 </ul>
                             </div>
                             <div class="header__logo">

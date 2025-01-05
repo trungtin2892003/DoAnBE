@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ShopCake.Models;
@@ -12,89 +13,110 @@ namespace ShopCake.Controllers
     public class CartController : Controller
     {
         private readonly CakeShopContext  _context;
+        private readonly CartService _cartService;
+        private readonly ILogger<CartController> _logger;
 
-        public CartController(CakeShopContext context)
+        public CartController(CakeShopContext context, CartService cartService, ILogger<CartController> logger)
         {
             _context = context;
+            _cartService = cartService;
+            _logger = logger;
+
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var cart = HttpContext.Session.Get<List<CartDetail>>("Cart") ?? new List<CartDetail>();
+            var userId = HttpContext.Session.GetInt32("USE_ID") ?? (int?)null;
 
-            // Lấy danh sách sản phẩm từ cơ sở dữ liệu để hiển thị hình ảnh
-            var productIds = cart.Select(c => c.PRO_ID).ToList();
-            var products = _context.Products.Where(p => productIds.Contains(p.PRO_ID)).ToList();
-
-            // Kết hợp thông tin từ giỏ hàng và cơ sở dữ liệu
-            var cartItems = cart.Select(c => new CartDetail
+            // Kiểm tra null
+            if (userId == null)
             {
-                PRO_ID = c.PRO_ID,
-                ProductName = c.ProductName,
-                Price = c.Price,
-                ProductImage = products.FirstOrDefault(p => p.PRO_ID == c.PRO_ID)?.Avatar,
-                Quantity = c.Quantity,
-                Total = c.Total
-            }).ToList();
-
-            return View(cartItems);
-        }
-
-        [HttpPost]
-        public IActionResult AddToCart(int productId, string productName, decimal price, string productImage, int quantity = 1)
-        {
-            // Lấy giỏ hàng từ session hoặc tạo mới nếu chưa có
-            var cart = HttpContext.Session.Get<List<CartDetail>>("Cart") ?? new List<CartDetail>();
-
-            // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-            var item = cart.FirstOrDefault(x => x.PRO_ID == productId);
-
-            // Nếu sản phẩm đã có trong giỏ, tăng số lượng
-            if (item != null)
-            {
-                item.Quantity += quantity;
-                item.Total = item.Price * item.Quantity; // Tính lại tổng giá trị của sản phẩm
+                Console.WriteLine("User ID is null!");
+                return RedirectToAction("Login", "User", new { area = "Admin" });
             }
-            else
+
+            try
             {
-                // Nếu sản phẩm chưa có, thêm mới vào giỏ
-                var newItem = new CartDetail
+                // Lấy giỏ hàng theo USE_ID
+                var cartItems = await _cartService.GetCartDetailsByUserId(userId.Value);
+                return View(cartItems);
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi để debug
+                Console.WriteLine($"Error while fetching cart details: {ex.Message}");
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+
+
+        // Thêm sản phẩm vào giỏ hàng
+        [HttpPost]
+        public async Task<IActionResult> AddToCart(int productId, string productName, decimal price, string productImage, int quantity = 1)
+        {
+
+            var userId = HttpContext.Session.GetInt32("USE_ID");
+            if (userId.HasValue)
+            {
+                var cartItem = new Cart
                 {
                     PRO_ID = productId,
                     ProductName = productName,
                     Price = price,
                     Quantity = quantity,
                     ProductImage = productImage,
-                    Total = price * quantity
+                    USE_ID = userId.Value, // Lấy giá trị USE_ID từ session
+                    TotalPrice = price * quantity
                 };
-                cart.Add(newItem);
+                await _cartService.AddToCart(cartItem);
+            }
+            else
+            {
+                Console.WriteLine("USE_ID không tồn tại trong session.");
+                return RedirectToAction("Login", "User", new { area = "Admin" });
             }
 
-            // Lưu giỏ hàng vào session
-            HttpContext.Session.Set("Cart", cart);
-
-            return RedirectToAction("Index"); // Quay lại trang giỏ hàng
+            // Lưu sản phẩm vào giỏ hàng trong CSDL
+           
+            _logger.LogInformation("User added item to cart.");
+            // Quay lại trang giỏ hàng hoặc trang sản phẩm
+            return RedirectToAction("Index");
         }
 
-
-
-        [HttpPost]
   
-        public IActionResult UpdateCart(int productId, int quantity)
+        [HttpPost]
+        public IActionResult UpdateQuantity(int productId, int quantity)
         {
+            // Lấy giỏ hàng từ Session
             var cart = HttpContext.Session.Get<List<CartDetail>>("Cart") ?? new List<CartDetail>();
 
+            // Tìm sản phẩm trong giỏ hàng
             var item = cart.FirstOrDefault(x => x.PRO_ID == productId);
             if (item != null)
             {
+                // Cập nhật số lượng và tổng tiền
                 item.Quantity = quantity;
                 item.Total = item.Price * quantity;
+
+                // Lưu lại giỏ hàng vào Session
+                HttpContext.Session.Set("Cart", cart);
+
+                // Tính tổng tiền giỏ hàng
+                var cartTotal = cart.Sum(x => x.Total);
+
+                // Trả về kết quả JSON
+                return Json(new
+                {
+                    success = true,
+                    newTotal = item.Total,
+                    cartTotal = cartTotal
+                });
             }
 
-            HttpContext.Session.Set("Cart", cart);
-
-            return RedirectToAction("Index");
+            return Json(new { success = false });
         }
+
 
         [HttpPost]
         public IActionResult RemoveFromCart(int productId)

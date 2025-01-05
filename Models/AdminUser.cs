@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace ShopCake.Models
 {
@@ -16,10 +18,8 @@ namespace ShopCake.Models
         public required string DisplayName { get; set; }
         [MaxLength(255)]
         public required string Password { get; set; }
-
-
-
         public string? Email { get; set; }
+        public string? Role { get; set; }
 
     }
 }

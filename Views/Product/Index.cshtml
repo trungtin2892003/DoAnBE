@@ -24,6 +24,7 @@
         </div>
     </div>
 </div>
+</section>
 <!-- Breadcrumb End -->
 <!-- Shop Section Begin -->
 <section class="shop spad">
@@ -57,7 +58,7 @@
                 @foreach (var product in products)
                 {
                     <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product.PRO_ID" class="text-dark">
+                    <a asp-controller="Product" asp-action="Details" asp-route-id="@product?.PRO_ID" class="text-dark">
                         <div class="product__item">
                             <div class="product__item__pic set-bg" data-setbg="/Data/product/@product.Avatar">
                                 <div class="product__label">
@@ -72,9 +73,8 @@
                                             <input type="hidden" name="productImage" value="@product?.Avatar" />
                                             <input type="hidden" name="price" value="@product?.Price" />
                                             <input type="hidden" name="productImage" value="/Data/product/@product?.Avatar" />
-                                            <button type="submit" class="btn btn-primary">Add to Cart</button>
+                                            <button type="submit" class="cart_add">Add to Cart</button>
                                         </form>
-
                             </div>
                         </div>
                         </a>
@@ -86,29 +86,6 @@
                 <p class="text-center">No products found.</p>
             }
         </div>
-    </div>
-</section>
-<!-- Shop Section End -->
-
-
-<div class="shop__last__option">
-            <div class="row">
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="shop__pagination">
-                        <a href="#">1</a>
-                        <a href="#">2</a>
-                        <a href="#">3</a>
-                        <a href="#"><span class="arrow_carrot-right"></span></a>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="shop__last__text">
-                        <p>Showing 1-9 of 10 results</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     </div>
 </section>
 <!-- Shop Section End -->

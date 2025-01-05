@@ -7,9 +7,7 @@ namespace ShopCake.Models
     public class CartDetail
     {
         [Key]
-        public int CARD_ID { get; set; } // Mã chi tiết giỏ hàng
-        public string? ProductName { get; set; }
-        public string?   ProductImage { get; set; }
+        public int USE_ID {  get; set; }
         [Required]
         public int CAR_ID { get; set; } // Mã giỏ hàng
 

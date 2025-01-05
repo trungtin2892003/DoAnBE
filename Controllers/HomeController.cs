@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopCake.Models;
 using System.Diagnostics;
@@ -14,6 +14,25 @@ namespace ShopCake.Controllers
             _context = context;
             _logger = logger;
         }
+        [HttpGet]
+        public IActionResult GetProductsByCategory(int categoryId)
+        {
+            // Lấy danh sách sản phẩm theo danh mục
+            var products = _context.Products
+                                   .Where(p => p.CAT_ID == categoryId)
+                                   .Select(p => new
+                                   {
+                                       p.PRO_ID,
+                                       p.Name,
+                                       p.Avatar,
+                                       p.Price,
+                                       CategoryName = p.Category.Name
+                                   })
+                                   .ToList();
+
+            // Trả về partial view hoặc JSON
+            return PartialView("_ProductListPartial", products);
+        }
 
         public IActionResult Index()
         {
@@ -25,8 +44,8 @@ namespace ShopCake.Controllers
          
             ViewData["HotProduct"] = _context.Products.AsNoTracking()
                .Include(x => x.Category)  // T?i Category c?a m?i s?n ph?m
-               .OrderBy(x => x.Price)  // S?p x?p s?n ph?m theo gi�
-              .ToList();  // L?y danh s�ch s?n ph?m sau khi s?p x?p
+               .OrderBy(x => x.Price)  // S?p x?p s?n ph?m theo giá
+              .ToList();  // L?y danh sách s?n ph?m sau khi s?p x?p
 
             return View();
         }
