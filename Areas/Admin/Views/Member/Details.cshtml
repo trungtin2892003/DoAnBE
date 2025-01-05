@@ -1,0 +1,39 @@
+﻿@model ShopCake.Models.Member
+
+@{
+    ViewData["Title"] = "Member  Details";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning text-white">
+            <h3 class="mb-0">@Html.DisplayFor(model => model.FirstName)</h3>
+        </div>
+        <div class="card-body">
+           
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.FirstName):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.FirstName)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.LastName):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.LastName)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Phone):</div>
+                <div class="col-md-8 ">@Html.DisplayFor(model => model.Phone)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Address):</div>
+                <div class="col-md-8 ">@Html.DisplayFor(model => model.Address)</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 font-weight-bold">@Html.DisplayNameFor(model => model.Email):</div>
+                <div class="col-md-8">@Html.DisplayFor(model => model.Email)</div>
+            </div>
+        </div>
+        <div class="card-footer text-right">
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+</div>

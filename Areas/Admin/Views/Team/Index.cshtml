@@ -57,15 +57,11 @@
             <th>
                 @Html.DisplayNameFor(model => model.InstagramUrl)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.createdBy)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.updatedDate)
-            </th>
+           
             <th>
                 @Html.DisplayNameFor(model => model.updatedBy)
             </th>
@@ -81,24 +77,20 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Position)
             </td>
-            <td>
-               <img src="~/Data/Team/@item.PhotoUrl" />
-            </td>
+                                            <td>
+                                                <img src="~/Data/Team/@item.PhotoUrl" alt="Team Image" style="width: 100px; height: 100px;" />
+                                            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.FacebookUrl)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.InstagramUrl)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
+            
             <td>
                 @Html.DisplayFor(modelItem => item.createdBy)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.updatedDate)
-            </td>
+            
             <td>
                 @Html.DisplayFor(modelItem => item.updatedBy)
             </td>

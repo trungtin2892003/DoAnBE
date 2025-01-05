@@ -121,8 +121,10 @@ namespace ShopCake.Areas.Admin.Controllers
                 Rate = request.Rate,
                 Description = request.Description,
                 Details = request.Details,
-                createdBy = userInfo.DisplayName,
-                updatedBy = userInfo.DisplayName,
+                createdBy = userInfo.UserName,
+                updatedBy = userInfo.UserName
+                //createdBy = userInfo.DisplayName,
+                //updatedBy = userInfo.DisplayName,
             };
 
             // Xử lý lưu ảnh
@@ -272,9 +274,14 @@ namespace ShopCake.Areas.Admin.Controllers
             return View(productDTO);
         }
 
+<<<<<<< HEAD
       
 
         
+=======
+
+
+>>>>>>> 31a07424cebfad80acd5749d0cc95f66ef0415cc
 
         // GET: Admin/Products/Delete/5
         public async Task<IActionResult> Delete(int? id)

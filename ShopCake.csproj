@@ -25,6 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Cart\CheckBill.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Update="Views\Home\Index.cshtml">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -33,6 +37,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\Admin\Data\Product\" />
+    <Folder Include="wwwroot\Data\BannerImg\" />
     <Folder Include="wwwroot\Data\Team\" />
   </ItemGroup>
 
