@@ -1,6 +1,6 @@
 ﻿@model ShopCake.Models.Order
-
-@{
+@* @model ShopCake.Models.OrderDetail
+ *@@{
     ViewData["Title"] = "Member  Details";
 }
 
@@ -69,12 +69,22 @@
                     <dd class="col-sm-10">
                         @Html.DisplayFor(model => model.Note)
                     </dd>
-                    <dt class="col-sm-2">
+                    <dt class="col-sm-2">                   
                         @Html.DisplayNameFor(model => model.Status)
                     </dt>
                     <dd class="col-sm-10">
-                        @Html.DisplayFor(model => model.Status)
-                    </dd>
+                        @if (Model.Status == 0)
+                        {
+                            @:Đã Giao
+                        }
+                        else if (Model.Status == 1)
+                        {
+                            @:Chưa Giao
+                        }
+
+                        
+@*                         @Html.DisplayFor(model => model.Status)
+ *@                    </dd>
                     <dt class="col-sm-2">
                         @Html.DisplayNameFor(model => model.Member)
                     </dt>
@@ -108,9 +118,10 @@
                 </dl>
             </div>
             <div>
-                <a asp-action="Edit" asp-route-id="@Model?.ORD_ID">Edit</a> |
-                <a asp-action="Index">Back to List</a>
+                <div class="card-footer text-right">
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                </div>
             </div>
+        </div>
     </div>
 </div>
-    </div>
