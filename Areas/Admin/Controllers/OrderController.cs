@@ -22,7 +22,7 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Admin/Order
         public async Task<IActionResult> Index()
         {
-            var cakeShopContext = _context.Orders.Include(o => o.Member);
+            var cakeShopContext = _context.Orders.Include(o => o.Member).Include(o => o.User);
             return View(await cakeShopContext.ToListAsync());
         }
 
@@ -36,6 +36,7 @@ namespace ShopCake.Areas.Admin.Controllers
 
             var order = await _context.Orders
                 .Include(o => o.Member)
+                .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.ORD_ID == id);
             if (order == null)
             {
@@ -49,6 +50,7 @@ namespace ShopCake.Areas.Admin.Controllers
         public IActionResult Create()
         {
             ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID");
+            ViewData["USE_ID"] = new SelectList(_context.AdminUsers, "USE_ID", "DisplayName");
             return View();
         }
 
@@ -57,7 +59,7 @@ namespace ShopCake.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ORD_ID,MEM_ID,OrderDate,CustomerName,Phone,Address,TotalPrice,Discount,PaymentMethod,IsPaid,Note,Status,CreatedDate,createdBy,updatedDate,updatedBy")] Order order)
+        public async Task<IActionResult> Create([Bind("ORD_ID,USE_ID,MEM_ID,OrderDate,CustomerName,Phone,Address,TotalPrice,Discount,PaymentMethod,IsPaid,Note,Status,CreatedDate,createdBy,updatedDate,updatedBy")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -66,6 +68,7 @@ namespace ShopCake.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID", order.MEM_ID);
+            ViewData["USE_ID"] = new SelectList(_context.AdminUsers, "USE_ID", "DisplayName", order.USE_ID);
             return View(order);
         }
 
@@ -83,6 +86,7 @@ namespace ShopCake.Areas.Admin.Controllers
                 return NotFound();
             }
             ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID", order.MEM_ID);
+            ViewData["USE_ID"] = new SelectList(_context.AdminUsers, "USE_ID", "DisplayName", order.USE_ID);
             return View(order);
         }
 
@@ -91,7 +95,7 @@ namespace ShopCake.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ORD_ID,MEM_ID,OrderDate,CustomerName,Phone,Address,TotalPrice,Discount,PaymentMethod,IsPaid,Note,Status,CreatedDate,createdBy,updatedDate,updatedBy")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("ORD_ID,USE_ID,MEM_ID,OrderDate,CustomerName,Phone,Address,TotalPrice,Discount,PaymentMethod,IsPaid,Note,Status,CreatedDate,createdBy,updatedDate,updatedBy")] Order order)
         {
             if (id != order.ORD_ID)
             {
@@ -119,6 +123,7 @@ namespace ShopCake.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID", order.MEM_ID);
+            ViewData["USE_ID"] = new SelectList(_context.AdminUsers, "USE_ID", "DisplayName", order.USE_ID);
             return View(order);
         }
 
@@ -132,6 +137,7 @@ namespace ShopCake.Areas.Admin.Controllers
 
             var order = await _context.Orders
                 .Include(o => o.Member)
+                .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.ORD_ID == id);
             if (order == null)
             {

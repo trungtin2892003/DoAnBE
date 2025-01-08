@@ -13,6 +13,10 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                <label asp-for="USE_ID" class="control-label"></label>
+                <select asp-for="USE_ID" class ="form-control" asp-items="ViewBag.USE_ID"></select>
+            </div>
+            <div class="form-group">
                 <label asp-for="MEM_ID" class="control-label"></label>
                 <select asp-for="MEM_ID" class ="form-control" asp-items="ViewBag.MEM_ID"></select>
             </div>

@@ -274,14 +274,7 @@ namespace ShopCake.Areas.Admin.Controllers
             return View(productDTO);
         }
 
-<<<<<<< HEAD
-      
 
-        
-=======
-
-
->>>>>>> 31a07424cebfad80acd5749d0cc95f66ef0415cc
 
         // GET: Admin/Products/Delete/5
         public async Task<IActionResult> Delete(int? id)

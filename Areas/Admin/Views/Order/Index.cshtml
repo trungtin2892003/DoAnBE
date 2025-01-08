@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ShopCake.Models.Order>
 
 @{
-    ViewData["Title"] = "Bill ";
+    ViewData["Title"] = "Bill List";
 }
 
 <div class="app-content">
@@ -17,7 +17,6 @@
                             <div class="col-md">
                                 <h3 class="card-title">Bill List</h3>
                             </div>
-
                         </div>
                     </div>
 
@@ -25,51 +24,17 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.OrderDate)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.CustomerName)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Phone)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Address)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.TotalPrice)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Discount)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.PaymentMethod)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.IsPaid)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Note)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Status)
-                                    </th>
-                                    <th>
-                                        @Html.DisplayNameFor(model => model.Member)
-                                    </th>
-                                @*      <th>
-                                         @Html.DisplayNameFor(model => model.CreatedDate)
-                                     </th>
-                                     <th>
-                                         @Html.DisplayNameFor(model => model.createdBy)
-                                     </th>
-                                     <th>
-                                         @Html.DisplayNameFor(model => model.updatedDate)
-                                     </th>
-                                     <th>
-                                         @Html.DisplayNameFor(model => model.updatedBy)
-                                     </th> *@
+                                    <th>@Html.DisplayNameFor(model => model.OrderDate)</th>
+                                    <th>@Html.DisplayNameFor(model => model.CustomerName)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Phone)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Address)</th>
+                                    <th>@Html.DisplayNameFor(model => model.TotalPrice)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Discount)</th>
+                                    <th>@Html.DisplayNameFor(model => model.PaymentMethod)</th>
+                                    <th>@Html.DisplayNameFor(model => model.IsPaid)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Note)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Status)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Member)</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -77,68 +42,40 @@
                                 @foreach (var item in Model)
                                 {
                                     <tr>
+                                        <td>@Html.DisplayFor(modelItem => item.OrderDate)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.CustomerName)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Phone)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Address)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.TotalPrice)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Discount)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.PaymentMethod)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.IsPaid)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.Note)</td>
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.OrderDate)
+                                            @if (item.Status == 0)
+                                            {
+                                                @:Đã giao
+                                            }
+                                            else if (item.Status == 1)
+                                            {
+                                                @:Chưa giao
+                                            }
                                         </td>
+                                        <td>@Html.DisplayFor(modelItem => item.Member.MEM_ID)</td>
                                         <td>
-                                            @Html.DisplayFor(modelItem => item.CustomerName)
+                                            <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@item.ORD_ID">
+                                                <i class="fas fa-info-circle"></i>
+                                            </a> 
                                         </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Phone)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Address)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.TotalPrice)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Discount)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.PaymentMethod)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.IsPaid)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Note)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Status)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Member.MEM_ID)
-                                        </td>
-                                  @*       <td>
-                                            @Html.DisplayFor(modelItem => item.CreatedDate)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.createdBy)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.updatedDate)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.updatedBy)
-                                        </td> *@
-                                        <td>
-@*                                             <a asp-action="Edit" asp-route-id="@item.ORD_ID">Edit</a> |
- *@                                            <a asp-action="Details" asp-route-id="@item.ORD_ID">Details</a> |
-@*                                             <a asp-action="Delete" asp-route-id="@item.ORD_ID">Delete</a>
- *@                                        </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     </div>
-                    </div>
-                    <!-- /.card-body -->
                 </div>
-                <!-- /.card -->
+                <!-- /.card-body -->
             </div>
-
-
+            <!-- /.card -->
         </div>
     </div>
-
+</div>
