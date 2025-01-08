@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.Http;
+﻿using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using ShopCake.Areas.Admin.DTO;
 using ShopCake.Models;
 using ShopCake.Unity;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace ShopCake.Controllers
@@ -26,27 +29,16 @@ namespace ShopCake.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var userId = HttpContext.Session.GetInt32("USE_ID") ?? (int?)null;
-
+            var userId = HttpContext.Session.GetInt32("User_USE_ID") ?? (int?)null;
             // Kiểm tra null
             if (userId == null)
             {
-                Console.WriteLine("User ID is null!");
-                return RedirectToAction("Login", "User", new { area = "Admin" });
+                TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục!";
+                return RedirectToAction("Index", "Home");
             }
-
-            try
-            {
                 // Lấy giỏ hàng theo USE_ID
-                var cartItems = await _cartService.GetCartDetailsByUserId(userId.Value);
-                return View(cartItems);
-            }
-            catch (Exception ex)
-            {
-                // Log lỗi để debug
-                Console.WriteLine($"Error while fetching cart details: {ex.Message}");
-                return StatusCode(500, "Internal Server Error");
-            }
+            var cartItems = await _cartService.GetCartDetailsByUserId(userId.Value);
+            return View(cartItems);
         }
 
 
@@ -73,65 +65,91 @@ namespace ShopCake.Controllers
             }
             else
             {
-                Console.WriteLine("USE_ID không tồn tại trong session.");
-                return RedirectToAction("Login", "User", new { area = "Admin" });
+                return RedirectToAction("Login", "User", new { area = "" });
             }
-
-            // Lưu sản phẩm vào giỏ hàng trong CSDL
-           
-            _logger.LogInformation("User added item to cart.");
             // Quay lại trang giỏ hàng hoặc trang sản phẩm
             return RedirectToAction("Index");
         }
 
-  
+
+        //Cập nhật số lượng 
         [HttpPost]
-        public IActionResult UpdateQuantity(int productId, int quantity)
+        public IActionResult UpdateQuantity([FromBody] UpdateQuantityDTO model)
         {
-            // Lấy giỏ hàng từ Session
-            var cart = HttpContext.Session.Get<List<CartDetail>>("Cart") ?? new List<CartDetail>();
-
-            // Tìm sản phẩm trong giỏ hàng
-            var item = cart.FirstOrDefault(x => x.PRO_ID == productId);
-            if (item != null)
-            {
-                // Cập nhật số lượng và tổng tiền
-                item.Quantity = quantity;
-                item.Total = item.Price * quantity;
-
-                // Lưu lại giỏ hàng vào Session
-                HttpContext.Session.Set("Cart", cart);
-
-                // Tính tổng tiền giỏ hàng
-                var cartTotal = cart.Sum(x => x.Total);
-
-                // Trả về kết quả JSON
-                return Json(new
+          
+                if (model == null || model.CartId <= 0 || model.Quantity <= 0)
                 {
-                    success = true,
-                    newTotal = item.Total,
-                    cartTotal = cartTotal
-                });
-            }
+                    return BadRequest("Invalid cart data.");
+                }
 
-            return Json(new { success = false });
+                // Tìm sản phẩm trong giỏ hàng
+                var cartItem = _context.Carts.FirstOrDefault(c => c.CAR_ID == model.CartId);
+                if (cartItem == null)
+                {
+                    return NotFound("Item not found in the cart.");
+                }
+
+                // Cập nhật số lượng và tổng giá trị
+                cartItem.Quantity = model.Quantity;
+                cartItem.TotalPrice = cartItem.Quantity * cartItem.Price;  // Cập nhật lại tổng giá trị
+
+               
+                if (model.Quantity == 0) {
+                    _context.Carts.Remove(cartItem);
+                }
+                _context.SaveChanges();
+            // Trả về thông tin cập nhật
+            return Ok(new { newTotalPrice = cartItem.TotalPrice.ToString("C") });
         }
 
 
-        [HttpPost]
-        public IActionResult RemoveFromCart(int productId)
+        // GET: Admin/Products/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            var cart = HttpContext.Session.Get<List<CartDetail>>("Cart") ?? new List<CartDetail>();
-
-            var item = cart.FirstOrDefault(x => x.PRO_ID == productId);
-            if (item != null)
+            if (id == null)
             {
-                cart.Remove(item);
+                return NotFound();
             }
 
-            HttpContext.Session.Set("Cart", cart);
+            var CartItem = await _context.Carts
+                .Include(p => p.USE_ID)
+                .FirstOrDefaultAsync(m => m.CAR_ID == id);
+            if (CartItem == null)
+            {
+                return NotFound();
+            }
 
-            return RedirectToAction("Index");
+            return View(CartItem);
         }
+
+        // POST: Admin/Products/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var CartItem = await _context.Carts.FindAsync(id);
+            if (CartItem != null)
+            {
+                _context.Carts.Remove(CartItem);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> Checkout()
+        {
+            var userId = HttpContext.Session.GetInt32("USE_ID") ?? (int?)null;
+            // Kiểm tra null
+            if (userId == null)
+            {
+                Console.WriteLine("User ID is null!");
+                return RedirectToAction("Login", "User", new { area = "Admin" });
+            }
+
+            // Lấy giỏ hàng theo USE_ID
+            var cartItems = await _cartService.GetCartDetailsByUserId(userId.Value);
+            return View(cartItems);
+        }
+
     }
 }

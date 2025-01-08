@@ -1,22 +1,41 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@{
+    // Lấy danh sách danh mục từ ViewData
+    var banenrs = ViewData["Banner"] as List<Banner> ?? new List<Banner>();
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'warning',
+            title: 'Thông báo',
+            text: '@Html.Raw(TempData["ErrorMessage"])',
+        });
+    </script>
+}
+
 
 <!-- Hero Section -->
 <section class="hero">
     <div class="hero__slider owl-carousel">
-        <div class="hero__item set-bg" data-setbg="img/hero/hero-1.jpg">
-            <div class="container">
-                <div class="row d-flex justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="hero__text">
-                            <h2>Making your life sweeter one bite at a time!</h2>
-                            <a href="#" class="primary-btn">Our cakes</a>
+        @foreach (var item in banenrs)
+        {
+            <div class="hero__item set-bg" data-setbg="/Data/BannerImg/@item.Image">
+                <div class="container">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-8">
+                            <div class="hero__text">
+                                <h2>Making your life sweeter one bite at a time!</h2>
+                                <a href="#" class="primary-btn">Our cakes</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        }
+       
         <div class="hero__item set-bg" data-setbg="img/hero/hero-1.jpg">
             <div class="container">
                 <div class="row d-flex justify-content-center">
@@ -82,6 +101,7 @@
     var categories = ViewData["Categories"] as List<Category> ?? new List<Category>();
 }
 
+
 <!-- Categories Section -->
 <div class="categories">
     <div class="container">
@@ -126,7 +146,7 @@
                                                 </div>
                                             </div>
                                             <div class="product__item__text">
-                                                <div class="product__item__price">@product.Price VND</div>
+                                                <div class="product__item__price">@string.Format("{0:0,0.000}", product.Price) VND</div>
                                                 <form asp-controller="Cart" asp-action="AddToCart" method="post">
                                                     <input type="hidden" name="productId" value="@product?.PRO_ID" />
                                                     <input type="hidden" name="productName" value="@product?.Name" />

@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Cart";
 }
+
 <div class="breadcrumb-option">
     <div class="container">
         <div class="row">
@@ -20,13 +21,13 @@
         </div>
     </div>
 </div>
+
 @if (TempData["Error"] != null)
 {
     <div class="alert alert-danger">
         @TempData["Error"]
     </div>
 }
-
 <section class="shopping-cart spad">
     <div class="container">
         <div class="row">
@@ -50,30 +51,28 @@
                                             <img src="~/Data/Product/@item.ProductImage" alt="@item.ProductName" style="width: 150px; height: 150px;" />
                                         </div>
                                         <div class="product__cart__item__text">
-
-
-
                                             <h6>@item.ProductName</h6>
-                                            <h5>@item.Price.ToString("C")</h5>
+                                            <h5>@string.Format("{0:0,0.000}", @item.Price) VND</h5>
                                         </div>
-                                       
                                     </td>
                                     <td class="quantity__item">
-                                        <div class="quantity d-flex align-items-left">
-                                            <button class="btn btn-outline-secondary dec qtybtn" onclick="updateQuantity(@item.PRO_ID, -1)">-</button>
-                                            <input type="number" id="qty-@item.PRO_ID" value="@item.Quantity" readonly class="form-control text-center qty-input">
-                                            <button class="btn btn-outline-secondary inc qtybtn" onclick="updateQuantity(@item.PRO_ID, 1)">+</button>
+                                        <div class="quantity w-2">
+                                            <input type="number" class="qty-input" id="quantity-@item.CAR_ID" value="@item.Quantity" min="0" max="50" required oninput="validatePrice(this)"
+                                            onchange="updateQuantity(@item.CAR_ID)" style="width: 50px; text-align: center;">
                                         </div>
+                                        <span id="error-message" style="color: red; font-size: 12px;"></span>
                                     </td>
-                                 
 
-
-                                    <td class="cart__price" id="total-price-@item.PRO_ID">@item.TotalPrice.ToString("C")</td>
-
+                                    <td class="cart__price" id="total-price-@item.PRO_ID">
+                                       @string.Format("{0:0,0.000}", @item.TotalPrice) VND
+                                    </td>
                                     <td class="cart__close">
-                                        <a asp-controller="Cart" asp-action="RemoveItem" asp-route-id="@item.PRO_ID">
+                                        <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.CAR_ID').submit();">
                                             <span class="icon_close"></span>
                                         </a>
+                                        <form id="deleteForm-@item.CAR_ID" action="@Url.Action("Delete", new { id = item.CAR_ID })" method="post" style="display:none;">
+                                            @Html.AntiForgeryToken()
+                                        </form>
                                     </td>
                                 </tr>
                             }
@@ -88,7 +87,7 @@
                     </div>
                     <div class="col-lg-6 col-md-6 col-sm-6">
                         <div class="continue__btn update__btn">
-                            <a href="#"><i class="fa fa-spinner"></i> Update cart</a>
+                            <a asp-action="Index" asp-controller="Cart"><i class="fa fa-spinner"></i> Update cart</a>
                         </div>
                     </div>
                 </div>
@@ -97,139 +96,52 @@
                 <div class="cart__total">
                     <h6>Cart total</h6>
                     <ul>
-                        <li>Subtotal <span>@Model.Sum(x => x.TotalPrice).ToString("C")</span></li>
-                        <li>Total <span id="cart-total">@Model.Sum(x => x.TotalPrice).ToString("C")</span></li>
-
+                        <li>Subtotal <span id="subtotal">@string.Format("{0:0,0.000}",@Model.Sum(x => x.TotalPrice)) VND</span></li>
+                        <li>Total <span id="cart-total">@string.Format("{0:0,0.000}", @Model.Sum(x => x.TotalPrice)) VND</span></li>
                     </ul>
-                    <a href="#" class="primary-btn">Proceed to checkout</a>
+                    <a asp-action="checkout" asp-controller="Cart" class="primary-btn">Proceed to checkout</a>
                 </div>
             </div>
         </div>
     </div>
 </section>
-<script>
-    var userId = '@ViewData["USE_ID"]';
-    console.log("USE_ID:", userId);
-</script>
+    <script>
+    function updateQuantity(cartId) {
+        const newQuantity = document.getElementById('quantity-' + cartId).value;
 
-<script>
-    function updateQuantity(productId, change) {
-        // Lấy số lượng hiện tại
-        var currentQty = parseInt(document.getElementById(`qty-${productId}`).value);
-        var newQty = currentQty + change;
+        const payload = {
+            cartId: cartId,
+            quantity: parseInt(newQuantity, 10)
+        };
 
-        // Ngăn số lượng về 0 hoặc âm
-        if (newQty <= 0) {
-            alert("Quantity must be at least 1.");
-            return;
-        }
-
-        // Gửi yêu cầu AJAX để cập nhật số lượng
         $.ajax({
-            url: '/Cart/UpdateQuantity', // Action để cập nhật số lượng
+            url: '/Cart/UpdateQuantity',  // API route để xử lý cập nhật
             type: 'POST',
-            data: { productId: productId, quantity: newQty },
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
             success: function (response) {
-                if (response.success) {
-                    // Cập nhật giao diện
-                    document.getElementById(`qty-${productId}`).value = newQty; // Số lượng mới
-                    document.querySelector(`#total-price-${productId}`).innerText = response.newTotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' }); // Tổng tiền sản phẩm
-
-                    // Cập nhật tổng tiền giỏ hàng
-                    document.getElementById('cart-total').innerText = response.cartTotal.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-                } else {
-                    alert("Failed to update quantity.");
-                }
+                console.log('Quantity updated successfully');
+                // Cập nhật lại giá trị TotalPrice nếu cần
+                $('#total-price-' + cartId).text(response.newTotalPrice);
             },
-            error: function () {
-                alert("An error occurred. Please try again.");
+            error: function (xhr, status, error) {
+                console.error('Error:', error);
             }
         });
     }
-</script>
-<script>
-    $(document).ready(function () {
-        $.ajax({
-            url: '/Cart/GetCartItems',
-            type: 'GET',
-            success: function (data) {
-                let cartHtml = '';
-                if (data.length > 0) {
-                    data.forEach(item => {
-                        cartHtml += `
-                            <tr>
-                                <td><img src="${item.productImage}" alt="${item.productName}" style="width: 50px;"></td>
-                                <td>${item.productName}</td>
-                                <td>${item.quantity}</td>
-                                <td>${item.price.toFixed(2)}</td>
-                                <td>${item.totalPrice.toFixed(2)}</td>
-                            </tr>`;
-                    });
-                } else {
-                    cartHtml = '<tr><td colspan="5">Giỏ hàng trống</td></tr>';
-                }
 
-                $('#cartTableBody').html(cartHtml);
-            },
-            error: function (err) {
-                console.error('Lỗi khi lấy giỏ hàng:', err);
-            }
-        });
-    });
 
-</script>
-<style>
-    .quantity {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        margin-left: -100px;
-    }
+    function validatePrice(input) {
+        const errorMessage = document.getElementById("error-message");
 
-    .qtybtn {
-        width: 35px;
-        height: 35px;
-        border-radius: 5px;
-        font-size: 18px;
-        font-weight: bold;
-        text-align: center;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        border: 1px solid #ddd;
-        background-color: #f9f9f9;
-        transition: all 0.3s ease;
-    }
-
-        .qtybtn:hover {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
+        if (input.value > 50) {
+            errorMessage.textContent = "Yêu cầu nhập < 50!";
+            input.value = 50;
+        } else {
+            errorMessage.textContent = ""; // Xóa lỗi nếu giá trị hợp lệ
         }
-
-    .qty-input {
-        width: 60px;
-        height: 35px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        text-align: center;
-        padding: 0;
-        font-size: 16px;
-        margin-left: 4px;
     }
+    </script>
 
-    .btn-outline-secondary {
-        border-color: #ddd;
-        color: #555;
-        background-color: #f9f9f9;
-    }
 
-        .btn-outline-secondary:hover {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-</style>
+

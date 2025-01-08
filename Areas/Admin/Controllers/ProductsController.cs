@@ -36,7 +36,7 @@ namespace ShopCake.Areas.Admin.Controllers
             // Nếu có từ khóa tìm kiếm, lọc danh sách theo tên sản phẩm
             if (!string.IsNullOrEmpty(searchString))
             {
-                products = products.Where(p => p.Name.Contains(searchString));
+                products = products.Where(p =>p.Name.Contains(searchString));
             }
 
             // Trả về danh sách sản phẩm sau khi lọc
@@ -274,14 +274,7 @@ namespace ShopCake.Areas.Admin.Controllers
             return View(productDTO);
         }
 
-<<<<<<< HEAD
-      
 
-        
-=======
-
-
->>>>>>> 31a07424cebfad80acd5749d0cc95f66ef0415cc
 
         // GET: Admin/Products/Delete/5
         public async Task<IActionResult> Delete(int? id)

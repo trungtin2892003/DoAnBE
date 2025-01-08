@@ -36,6 +36,7 @@ namespace ShopCake.Controllers
 
         public IActionResult Index()
         {
+            var errorMessage = TempData["ErrorMessage"];
             ViewData["Categories"] = _context.Categories.AsNoTracking()
                .OrderBy(c => c.DisplayOrder)  
                .Include(x => x.Products)  
@@ -46,6 +47,7 @@ namespace ShopCake.Controllers
                .Include(x => x.Category)  // T?i Category c?a m?i s?n ph?m
                .OrderBy(x => x.Price)  // S?p x?p s?n ph?m theo giá
               .ToList();  // L?y danh sách s?n ph?m sau khi s?p x?p
+            ViewData["Banner"] = _context.Banners.AsNoTracking().OrderBy(b => b.DisplayOrder).ToList();
 
             return View();
         }

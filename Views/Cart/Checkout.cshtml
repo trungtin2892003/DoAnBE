@@ -1,9 +1,8 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@model List<ShopCake.Models.Cart>
 <!-- Breadcrumb Begin -->
+@{
+    ViewData["Title"] = "Checkout";
+}
 <div class="breadcrumb-option">
     <div class="container">
         <div class="row">
@@ -114,18 +113,23 @@
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6">
+                           
                         <div class="checkout__order">
                             <h6 class="order__title">Your order</h6>
                             <div class="checkout__order__products">Product <span>Total</span></div>
-                            <ul class="checkout__total__products">
-                                <li><samp>01.</samp> Vanilla salted caramel <span>$ 300.0</span></li>
-                                <li><samp>02.</samp> German chocolate <span>$ 170.0</span></li>
-                                <li><samp>03.</samp> Sweet autumn <span>$ 170.0</span></li>
-                                <li><samp>04.</samp> Cluten free mini dozen <span>$ 110.0</span></li>
-                            </ul>
+                            @foreach (var item in Model)
+                            {
+                                <ul class="checkout__total__products">
+                                    <li>@item.ProductName <span>$@item.TotalPrice.ToString("F2")</span></li>
+
+                                </ul>
+                            }
                             <ul class="checkout__total__all">
-                                <li>Subtotal <span>$750.99</span></li>
-                                <li>Total <span>$750.99</span></li>
+                                <li>
+                                    Subtotal <span>
+                                        @Model.Sum(item => item.TotalPrice).ToString("F2")
+                                    </span>
+                                </li>
                             </ul>
                             <div class="checkout__input__checkbox">
                                 <label for="acc-or">

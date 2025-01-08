@@ -12,8 +12,6 @@ namespace ShopCake.Controllers
         {
             _context = context;
         }
-
-        // Thêm sản phẩm vào giỏ hàng
         // Thêm sản phẩm vào giỏ hàng trong CSDL
         public async Task AddToCart(Cart item)
         {
@@ -44,24 +42,6 @@ namespace ShopCake.Controllers
             return await _context.Carts.Where(c => c.USE_ID == userId).ToListAsync();
         }
 
-
-
-
-   
-        public List<Cart> GetCartDetails()
-        {
-            return _context.Carts.ToList();
-        }
-        // Xóa sản phẩm khỏi giỏ hàng
-        public async Task RemoveFromCart(int cartId)
-        {
-            var item = await _context.Carts.FindAsync(cartId);
-            if (item != null)
-            {
-                _context.Carts.Remove(item);
-                await _context.SaveChangesAsync();
-            }
-        }
     }
 
 }

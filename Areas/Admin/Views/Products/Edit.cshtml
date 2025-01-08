@@ -30,44 +30,26 @@
                         <!-- Avatar Upload -->
                         <div class="form-group">
                             <label asp-for="Avatar" class="control-label">Current Avatar</label>
-<<<<<<< HEAD
-                     
                             <!-- Input để chọn ảnh mới -->
                             <div class="form-group">
-                     
                                 <img id="image-preview" src="~/Data/Product/@Model.Avatar" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
-                                @*  <img id="image-preview" src="" alt="New Avatar Preview" style="max-width: 200px; height: auto; display: none; margin-top: 10px;" /> *@
-=======
-                           @*  <!-- Hiển thị ảnh đại diện cũ -->
-                            <div>
-                                <img src="~/Data/Product/@Model.Avatar" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
-                            </div> *@
                             <!-- Input để chọn ảnh mới -->
                             <div class="form-group">
                                 <label>New Avatar Preview</label>
                                 <img id="image-preview" src="~/Data/Product/@Model.Avatar" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
                                @*  <img id="image-preview" src="" alt="New Avatar Preview" style="max-width: 200px; height: auto; display: none; margin-top: 10px;" /> *@
->>>>>>> 31a07424cebfad80acd5749d0cc95f66ef0415cc
                             </div>
                             <input asp-for="Avatar" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
                             <span asp-validation-for="Avatar" class="text-danger"></span>
                         </div>
 
 
-<<<<<<< HEAD
-=======
-                         @* <div class="form-group">
-                             <label asp-for="Avatar" class="control-label"></label>
-                             <input asp-for="Avatar" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
-                             <span asp-validation-for="Avatar" class="text-danger"></span>
-                         </div> *@
->>>>>>> 31a07424cebfad80acd5749d0cc95f66ef0415cc
-                       
+
 
                         <!-- Name -->
                         <div class="form-group">
                             <label asp-for="Name" class="control-label"></label>
-                            <input asp-for="Name" class="form-control" type="text" />
+                            <input asp-for="Name" class="form-control" type="text" maxlength="125" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
                         <!-- Name -->
@@ -168,7 +150,12 @@
             } else {
                 errorMessage.textContent = ""; // Xóa lỗi nếu giá trị hợp lệ
             }
+ 
+
         }
+ 
+
+
     </script>
     <script type="importmap">
         {
@@ -250,4 +237,3 @@
     <partial name="_ValidationScriptsPartial" />
 }
 
-}

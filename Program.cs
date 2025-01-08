@@ -46,7 +46,7 @@ namespace ShopCake
 
             // Kích hoạt session (bắt buộc để sử dụng session)
             app.UseSession();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             // Định nghĩa route cho khu vực (areas)

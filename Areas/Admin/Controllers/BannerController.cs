@@ -15,10 +15,7 @@ namespace ShopCake.Areas.Admin.Controllers
         private readonly CakeShopContext _context;
         private readonly IWebHostEnvironment _hostEnv;
         private const string BannerFolderName = "BannerImg";
-<<<<<<< HEAD
 
-=======
->>>>>>> 31a07424cebfad80acd5749d0cc95f66ef0415cc
 
        
         public BannerController(CakeShopContext context, IWebHostEnvironment hostEnv)
@@ -103,11 +100,6 @@ namespace ShopCake.Areas.Admin.Controllers
             }
         }
 
-<<<<<<< HEAD
-
-=======
-       
->>>>>>> 31a07424cebfad80acd5749d0cc95f66ef0415cc
         // GET: Admin/Banner/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {

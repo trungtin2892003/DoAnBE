@@ -99,7 +99,7 @@ namespace ShopCake.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("SET_ID,Name,Value,CreatedDate,createdBy,updatedDate,updatedBy")] Setting setting)
+        public async Task<IActionResult> Edit(int id, [FromForm] Setting setting)
         {
             var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
 
@@ -116,6 +116,17 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 try
                 {
+                    // Lấy bản ghi gốc từ DB
+                    var originalSetting = await _context.Settings.AsNoTracking().FirstOrDefaultAsync(s => s.SET_ID == id);
+                    if (originalSetting == null)
+                    {
+                        return NotFound();
+                    }
+
+                    // Giữ nguyên giá trị createdBy
+                    setting.createdBy = originalSetting.createdBy;
+
+                    // Cập nhật bản ghi
                     _context.Update(setting);
                     await _context.SaveChangesAsync();
                 }
@@ -134,6 +145,7 @@ namespace ShopCake.Areas.Admin.Controllers
             }
             return View(setting);
         }
+
 
         // GET: Admin/Settings/Delete/5
         public async Task<IActionResult> Delete(int? id)

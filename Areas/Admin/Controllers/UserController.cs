@@ -14,37 +14,42 @@ namespace ShopCake.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly CakeShopContext _context;
-
-        public UserController(CakeShopContext context)
+        private readonly ILogger<UserController> _logger;
+        public UserController(CakeShopContext context, ILogger<UserController> logger)
         {
+            _logger = logger;
             _context = context;
+            
         }
 
         // GET: Login page
         [HttpGet]
-            public IActionResult Login()
-            {
-            // Kiểm tra cookie để tự động đăng nhập
+        public IActionResult Login()
+        {
+
             var cookie = Request.Cookies["UserCredential"];
             if (!string.IsNullOrEmpty(cookie))
             {
                 var login = JsonSerializer.Deserialize<LoginDTO>(cookie);
-                var result = _context.AdminUsers.AsNoTracking()
-                    .FirstOrDefault(x => x.UserName == login.Username &&
-                                         x.Password == login.Password); // Chưa hash
+                var user = _context.AdminUsers.AsNoTracking()
+                    .FirstOrDefault(x => x.UserName == login.Username);
 
-                if (result != null)
+                if (user != null && BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
                 {
                     // Lưu thông tin người dùng vào session
-                    HttpContext.Session.Set("userInfo", result);
-                    // Lưu thông tin người dùng vào session
-                    HttpContext.Session.SetInt32("USE_ID", result.USE_ID);
-                    // Sau khi đăng nhập thành công, chuyển hướng đến trang Home
-                    return RedirectToAction("Index", "Home");
+                    HttpContext.Session.Set("userInfo", user);
+                    HttpContext.Session.SetInt32("USE_ID", user.USE_ID);
+
+                    if (user.Role == "Admin")
+                    {
+                        return RedirectToAction("Index", "Home", new { area = "Admin" });
+                    }
+                    else if (user.Role == "")
+                    {
+                        return RedirectToAction("Index", "Home", new { area = "" });
+                    }
                 }
             }
-
-            // Nếu không tìm thấy thông tin người dùng hợp lệ
             return View();
         }
         [HttpGet]
@@ -87,9 +92,6 @@ namespace ShopCake.Areas.Admin.Controllers
 
             _context.AdminUsers.Add(newUser);
             await _context.SaveChangesAsync();
-
-            // Điều hướng đến trang đăng nhập sau khi đăng ký thành công
-            TempData["Message"] = "Account created successfully. Please login.";
             return RedirectToAction("Login", "User", new { Area = "Admin" });
 
         }
@@ -99,36 +101,59 @@ namespace ShopCake.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDTO login)
         {
-            // Kiểm tra thông tin đăng nhập trong database
-            var result = await _context.AdminUsers
+            // Tìm kiếm người dùng theo tên đăng nhập
+            var user = await _context.AdminUsers
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserName == login.Username &&
-                                          x.Password == login.Password); // Chưa hash
+                .FirstOrDefaultAsync(x => x.UserName == login.Username);
 
-            if (result != null)
+            if (user != null)
             {
-
-                // Lưu thông tin người dùng vào session
-                HttpContext.Session.Set("userInfo", result);
-
-                // Lưu thông tin đăng nhập vào cookie
-                var cookieValue = JsonSerializer.Serialize(login);
-                Response.Cookies.Append("UserCredential", cookieValue, new CookieOptions
+                // Kiểm tra mật khẩu đã mã hóa
+                if (BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
                 {
-                    Expires = DateTimeOffset.UtcNow.AddDays(7),
-                    HttpOnly = true,
-                    Secure = true // Chỉ hoạt động trên HTTPS
-                });
+                    // Lưu thông tin người dùng vào session
+                    HttpContext.Session.Set("userInfo", user);
+                    if (user.Role == "Admin")
+                    {
+                        // Lưu session dành riêng cho admin
+                        HttpContext.Session.SetInt32("Admin_USE_ID", user.USE_ID);
 
-                // Chuyển hướng về trang Index
-                return RedirectToAction("Index", "Home");
+                        
+                    }
+                    else if (user.Role == "")
+                    {
+                        // Lưu session dành riêng cho user
+                        HttpContext.Session.SetInt32("User_USE_ID", user.USE_ID);
+
+                        
+                    }
+
+                    // Lưu thông tin đăng nhập vào cookie
+                    var cookieValue = JsonSerializer.Serialize(new LoginDTO
+                    {
+                        Username = login.Username,
+                        Password = user.Password // Lưu mật khẩu mã hóa vào cookie
+                    });
+                    Response.Cookies.Append("UserCredential", cookieValue, new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddDays(7),
+                        HttpOnly = true,
+                        Secure = true // Chỉ hoạt động trên HTTPS
+                    });
+
+                    // Phân quyền theo Role
+                    if (user.Role == "Admin")
+                    {
+                        return RedirectToAction("Index", "Home", new { area = "Admin" });
+                    }
+                    else
+                    {
+                        return RedirectToAction("Index", "Home", new { area = "" });
+                    }
+                }
             }
-
-            // Nếu sai thông tin, hiển thị thông báo
-            ViewData["Message"] = "Wrong username or password";
             return View();
         }
-
 
 
         // POST: Logout
