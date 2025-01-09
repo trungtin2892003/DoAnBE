@@ -48,7 +48,7 @@ namespace ShopCake.Controllers
         public async Task<IActionResult> AddToCart(int productId, string productName, decimal price, string productImage, int quantity = 1)
         {
 
-            var userId = HttpContext.Session.GetInt32("USE_ID");
+            var userId = HttpContext.Session.GetInt32("User_USE_ID");
             if (userId.HasValue)
             {
                 var cartItem = new Cart
@@ -65,7 +65,7 @@ namespace ShopCake.Controllers
             }
             else
             {
-                return RedirectToAction("Login", "User", new { area = "" });
+                return RedirectToAction("Login", "User", new { area = "Admin" });
             }
             // Quay lại trang giỏ hàng hoặc trang sản phẩm
             return RedirectToAction("Index");
@@ -138,7 +138,7 @@ namespace ShopCake.Controllers
         }
         public async Task<IActionResult> Checkout()
         {
-            var userId = HttpContext.Session.GetInt32("USE_ID") ?? (int?)null;
+            var userId = HttpContext.Session.GetInt32("User_USE_ID") ?? (int?)null;
             // Kiểm tra null
             if (userId == null)
             {

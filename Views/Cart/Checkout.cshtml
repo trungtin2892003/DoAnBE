@@ -1,167 +1,131 @@
-﻿@model List<ShopCake.Models.Cart>
-<!-- Breadcrumb Begin -->
+﻿@model List<Cart>
 @{
     ViewData["Title"] = "Checkout";
+    var totalAmount = Model.Sum(x => x.TotalPrice);
 }
-<div class="breadcrumb-option">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6">
-                <div class="breadcrumb__text">
-                    <h2>Bill Check</h2>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Thông tin đặt hàng</h3>
+                </div>
+                <div class="card-body">
+                    <form id="checkoutForm" class="needs-validation" novalidate>
+                        <div class="form-group mb-3">
+                            <label>Họ tên</label>
+                            <input type="text" class="form-control" id="customerName" required>
+                            <div class="invalid-feedback">Vui lòng nhập họ tên</div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Số điện thoại</label>
+                            <input type="tel" class="form-control" id="phone" pattern="[0-9]{10}" required>
+                            <div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ (10 số)</div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Địa chỉ</label>
+                            <textarea class="form-control" id="address" required></textarea>
+                            <div class="invalid-feedback">Vui lòng nhập địa chỉ</div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label>Phương thức thanh toán</label>
+                            <select class="form-control" id="paymentMethod" required>
+                                <option value="">Chọn phương thức thanh toán</option>
+                                <option value="COD">Thanh toán khi nhận hàng</option>
+                                <option value="Banking">Chuyển khoản</option>
+                            </select>
+                            <div class="invalid-feedback">Vui lòng chọn phương thức thanh toán</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mt-3">Đặt hàng</button>
+                    </form>
                 </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-6">
-                <div class="breadcrumb__links">
-                    <a href="./index.html">Home</a>
-                    <span>Bill Check</span>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Đơn hàng của bạn</h3>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>@item.ProductName x @item.Quantity</span>
+                            <span>@item.TotalPrice.ToString("N0") đ</span>
+                        </div>
+                    }
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Tổng cộng:</strong>
+                        <strong>@totalAmount.ToString("N0") đ</strong>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<!-- Breadcrumb End -->
-<!-- Checkout Section Begin -->
-<section class="checkout spad">
-    <div class="container">
-        <div class="checkout__form">
-            <form action="#">
-                <div class="row">
-                    <div class="col-lg-8 col-md-6">
-                        <h6 class="coupon__code">
-                            <span class="icon_tag_alt"></span> Have a coupon? <a href="#">
-                                Click
-                                here
-                            </a> to enter your code
-                        </h6>
-                        <h6 class="checkout__title">Billing Details</h6>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="checkout__input">
-                                    <p>Fist Name<span>*</span></p>
-                                    <input type="text">
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="checkout__input">
-                                    <p>Last Name<span>*</span></p>
-                                    <input type="text">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="checkout__input">
-                            <p>Country<span>*</span></p>
-                            <input type="text">
-                        </div>
-                        <div class="checkout__input">
-                            <p>Address<span>*</span></p>
-                            <input type="text" placeholder="Street Address" class="checkout__input__add">
-                            <input type="text" placeholder="Apartment, suite, unite ect (optinal)">
-                        </div>
-                        <div class="checkout__input">
-                            <p>Town/City<span>*</span></p>
-                            <input type="text">
-                        </div>
-                        <div class="checkout__input">
-                            <p>Country/State<span>*</span></p>
-                            <input type="text">
-                        </div>
-                        <div class="checkout__input">
-                            <p>Postcode / ZIP<span>*</span></p>
-                            <input type="text">
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <div class="checkout__input">
-                                    <p>Phone<span>*</span></p>
-                                    <input type="text">
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="checkout__input">
-                                    <p>Email<span>*</span></p>
-                                    <input type="text">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="checkout__input__checkbox">
-                            <label for="acc">
-                                Create an account?
-                                <input type="checkbox" id="acc">
-                                <span class="checkmark"></span>
-                            </label>
-                            <p>
-                                Create an account by entering the information below. If you are a returning customer
-                                please login at the top of the page
-                            </p>
-                        </div>
-                        <div class="checkout__input">
-                            <p>Account Password<span>*</span></p>
-                            <input type="text">
-                        </div>
-                        <div class="checkout__input__checkbox">
-                            <label for="diff-acc">
-                                Note about your order, e.g, special noe for delivery
-                                <input type="checkbox" id="diff-acc">
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>
-                        <div class="checkout__input">
-                            <p>Order notes<span>*</span></p>
-                            <input type="text"
-                                   placeholder="Notes about your order, e.g. special notes for delivery.">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6">
-                           
-                        <div class="checkout__order">
-                            <h6 class="order__title">Your order</h6>
-                            <div class="checkout__order__products">Product <span>Total</span></div>
-                            @foreach (var item in Model)
-                            {
-                                <ul class="checkout__total__products">
-                                    <li>@item.ProductName <span>$@item.TotalPrice.ToString("F2")</span></li>
 
-                                </ul>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#checkoutForm').on('submit', function (e) {
+                e.preventDefault();
+
+                const form = $(this)[0];
+                if (!form.checkValidity()) {
+                    e.stopPropagation();
+                    form.classList.add('was-validated');
+                    return;
+                }
+
+                const submitButton = $(this).find('button[type="submit"]');
+                submitButton.prop('disabled', true);
+
+                const orderData = {
+                    customerName: $('#customerName').val().trim(),
+                    phone: $('#phone').val().trim(),
+                    address: $('#address').val().trim(),
+                    paymentMethod: $('#paymentMethod').val(),
+                    totalPrice: @totalAmount
+                        };
+
+                $.ajax({
+                    url: '/Cart/ProcessCheckout',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(orderData),
+                    success: function (response) {
+                        // Cập nhật status của cart items
+                        cartItems.forEach(function (item) {
+                            item.Status = "Ordered";
+                        });
+
+                        window.location.href = '/Cart/OrderSuccess/' + response.orderId;
+                    },
+                    error: function (xhr, status, error) {
+                        let errorMessage = 'Có lỗi xảy ra khi đặt hàng';
+                        console.error('Status:', status);
+                        console.error('Error:', error);
+                        console.error('Response:', xhr.responseText);
+
+                        if (xhr.responseText) {
+                            try {
+                                const response = JSON.parse(xhr.responseText);
+                                errorMessage = response.message;
+                                if (response.error) {
+                                    console.error('Detailed error:', response.error);
+                                    errorMessage += '\nChi tiết lỗi: ' + response.error;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing response:', e);
                             }
-                            <ul class="checkout__total__all">
-                                <li>
-                                    Subtotal <span>
-                                        @Model.Sum(item => item.TotalPrice).ToString("F2")
-                                    </span>
-                                </li>
-                            </ul>
-                            <div class="checkout__input__checkbox">
-                                <label for="acc-or">
-                                    Create an account?
-                                    <input type="checkbox" id="acc-or">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adip elit, sed do eiusmod tempor incididunt
-                                ut labore et dolore magna aliqua.
-                            </p>
-                            <div class="checkout__input__checkbox">
-                                <label for="payment">
-                                    Check Payment
-                                    <input type="checkbox" id="payment">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <div class="checkout__input__checkbox">
-                                <label for="paypal">
-                                    Paypal
-                                    <input type="checkbox" id="paypal">
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
-                            <button type="submit" class="site-btn">PLACE ORDER</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</section>
-<!-- Checkout Section End -->
+                        }
+                        alert(errorMessage);
+                        submitButton.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+}

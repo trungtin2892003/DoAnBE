@@ -1,0 +1,37 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-body text-center">
+            <h2 class="text-success">Đặt hàng thành công!</h2>
+            <p>Mã đơn hàng của bạn là: #@Model.ORD_ID</p>
+            <div class="order-details mt-4">
+                <h4>Chi tiết đơn hàng</h4>
+                <p><strong>Họ tên:</strong> @Model.CustomerName</p>
+                <p><strong>Số điện thoại:</strong> @Model.Phone</p>
+                <p><strong>Địa chỉ:</strong> @Model.Address</p>
+                <p><strong>Tổng tiền:</strong> @Model.TotalPrice.ToString("N0") đ</p>
+                <p><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+            </div>
+            <div class="order-status">
+                <strong>Trạng thái:</strong>
+                @if (Model.Status == 1)
+                {
+                    <span class="badge badge-warning">Chưa giao</span>
+                }
+                else if (Model.Status == 0)
+                {
+                    <span class="badge badge-success">Đã giao</span>
+                }
+                else
+                {
+                    <span class="badge badge-secondary">@Model.Status</span>
+                }
+            </div>
+            <a href="/" class="btn btn-primary mt-3">Về trang chủ</a>
+        </div>
+    </div>
+</div> 

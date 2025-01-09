@@ -14,12 +14,15 @@ namespace ShopCake.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly CakeShopContext _context;
+        private readonly EmailService _emailService;
         private readonly ILogger<UserController> _logger;
-        public UserController(CakeShopContext context, ILogger<UserController> logger)
+        public UserController(CakeShopContext context, ILogger<UserController> logger,EmailService emailService)
         {
             _logger = logger;
             _context = context;
-            
+            _emailService = emailService;
+
+
         }
 
         // GET: Login page
@@ -84,17 +87,20 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 UserName = register.UserName,
                 Email = register.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(register.Password), // Mã hóa password
+                Password = BCrypt.Net.BCrypt.HashPassword(register.Password),
                 DisplayName = register.UserName, // Hoặc gán giá trị phù hợp
                 CreatedDate = DateTime.UtcNow
             };
 
-
             _context.AdminUsers.Add(newUser);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Login", "User", new { Area = "Admin" });
 
+            // Gửi email thông báo đăng ký thành công từ địa chỉ email ảo
+            await _emailService.SendEmailAsync(register.Email, register.UserName); // Truyền email và tên người dùng
+
+            return RedirectToAction("Login", "User", new { Area = "Admin" });
         }
+
 
         // POST: Login
         [HttpPost]
@@ -120,7 +126,7 @@ namespace ShopCake.Areas.Admin.Controllers
 
                         
                     }
-                    else if (user.Role == "")
+                    else if (user.Role == null)
                     {
                         // Lưu session dành riêng cho user
                         HttpContext.Session.SetInt32("User_USE_ID", user.USE_ID);

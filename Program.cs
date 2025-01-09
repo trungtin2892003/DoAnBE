@@ -1,6 +1,7 @@
 ﻿using ShopCake.Models;
 using Microsoft.EntityFrameworkCore;
 using ShopCake.Controllers;
+using ShopCake.Areas.Admin.Controllers;
 
 namespace ShopCake
 {
@@ -10,7 +11,8 @@ namespace ShopCake
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Logging.ClearProviders();  // Xóa các nhà cung cấp logging mặc định nếu cần
-            builder.Logging.AddConsole();      // Thêm log vào console (mặc định)
+            builder.Services.AddTransient<EmailService>();
+
             builder.Logging.AddDebug();
             // Thêm dịch vụ vào container DI
             builder.Services.AddScoped<CartService>();
