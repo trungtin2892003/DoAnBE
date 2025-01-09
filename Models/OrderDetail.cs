@@ -10,7 +10,7 @@ namespace ShopCake.Models
         public int ORDD_ID { get; set; }
         public required int ORD_ID { get; set; }
         public required int PRO_ID { get; set; }
-        public required decimal Quantity { get; set; }
+        public required int Quantity { get; set; }
         public required decimal Price { get; set; }
         public decimal DiscountPrice { get; set; }
 

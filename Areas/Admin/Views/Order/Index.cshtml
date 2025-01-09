@@ -34,7 +34,7 @@
                                     <th>@Html.DisplayNameFor(model => model.IsPaid)</th>
                                     <th>@Html.DisplayNameFor(model => model.Note)</th>
                                     <th>@Html.DisplayNameFor(model => model.Status)</th>
-                                    <th>@Html.DisplayNameFor(model => model.Member)</th>
+                                    <th>@Html.DisplayNameFor(model => model.User)</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -61,7 +61,7 @@
                                                 @:Chưa giao
                                             }
                                         </td>
-                                        <td>@Html.DisplayFor(modelItem => item.Member.MEM_ID)</td>
+                                        <td>@Html.DisplayFor(modelItem => item.User.DisplayName)</td>
                                         <td>
                                             <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@item.ORD_ID">
                                                 <i class="fas fa-info-circle"></i>

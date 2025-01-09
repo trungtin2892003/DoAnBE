@@ -7,15 +7,13 @@ namespace ShopCake.Models
     public class Cart 
     {
         [Key]
-        public int CAR_ID { get; set; } // Mã giỏ hàng
-        public int PRO_ID { get; set; } // Mã sản phẩm
+        public int CAR_ID { get; set; }
+        public int PRO_ID { get; set; }
         public string? ProductName { get; set; }
-
         public string? ProductImage { get; set; }
         public string? SessionId { get; set; }
         public int USE_ID { get; set; }
         public int Quantity { get; set; }
-       
         public DateTime CartDate { get; set; } = DateTime.Now;
         public string? CustomerName { get; set; }
         public decimal Price { get; set; }
@@ -24,19 +22,16 @@ namespace ShopCake.Models
         public decimal TotalPrice
         {
             get => Quantity * Price;
-            set { } // Thêm setter rỗng (nếu cần gán)
+            set { }
         }
-        public double? Discount { get; set; }
+        public decimal? Discount { get; set; }
         public string? PaymentMethod { get; set; }
         public string? Note { get; set; }
         public string? Status { get; set; }
- 
-        // Quan hệ với các bảng khác
+
         [ForeignKey("USE_ID")]
-        public virtual Order? User { get; set; } // Quan hệ với bảng Users
+        public virtual AdminUser? User { get; set; }
 
-
-
-        public virtual ICollection<CartDetail>? CartDetails { get; set; } // Quan hệ với chi tiết giỏ hàng
+        public virtual ICollection<CartDetail>? CartDetails { get; set; }
     }
 }
