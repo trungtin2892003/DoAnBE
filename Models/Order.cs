@@ -8,6 +8,7 @@ namespace ShopCake.Models
     {
         [Key]
         public int ORD_ID { get; set; }
+        
         public int? USE_ID { get; set; }
         public int? MEM_ID { get; set; }
         public required DateTime OrderDate { get; set; }

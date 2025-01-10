@@ -17,13 +17,13 @@ namespace ShopCake.Controllers
     {
         private readonly CakeShopContext  _context;
         private readonly CartService _cartService;
-        private readonly ILogger<CartController> _logger;
+      
 
-        public CartController(CakeShopContext context, CartService cartService, ILogger<CartController> logger)
+        public CartController(CakeShopContext context, CartService cartService)
         {
             _context = context;
             _cartService = cartService;
-            _logger = logger;
+            
 
         }
 

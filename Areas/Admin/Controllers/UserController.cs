@@ -130,13 +130,13 @@ namespace ShopCake.Areas.Admin.Controllers
                     {
                         // Lưu session dành riêng cho user
                         HttpContext.Session.SetInt32("User_USE_ID", user.USE_ID);
-
-                        
+ 
                     }
 
                     // Lưu thông tin đăng nhập vào cookie
                     var cookieValue = JsonSerializer.Serialize(new LoginDTO
                     {
+                        USE_ID = user.USE_ID,
                         Username = login.Username,
                         Password = user.Password // Lưu mật khẩu mã hóa vào cookie
                     });

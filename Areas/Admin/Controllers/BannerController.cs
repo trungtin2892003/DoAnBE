@@ -99,7 +99,6 @@ namespace ShopCake.Areas.Admin.Controllers
                 return View(banner);
             }
         }
-
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

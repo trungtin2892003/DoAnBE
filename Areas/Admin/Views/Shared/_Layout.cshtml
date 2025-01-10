@@ -134,7 +134,7 @@
                             </li> <!--end::User Image--> <!--begin::Menu Body-->
                           
                             <li class="user-footer">
-                                <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                
                                 <form asp-controller="User" asp-area="Admin" asp-action="Logout" method="post" style="display:inline;">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-default btn-flat">Sign out</button>
@@ -234,6 +234,15 @@
                             <a asp-area="Admin" asp-controller="Member" asp-action="index" class="nav-link">
                                 <i class="fa-solid fa-universal-access"></i>                                <p>
                                     Member
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="ContactForms" asp-action="index" class="nav-link">
+                                <i class="fa-solid fa-universal-access"></i>                                <p>
+                                    Contact
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
