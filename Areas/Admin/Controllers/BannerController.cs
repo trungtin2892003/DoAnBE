@@ -112,8 +112,11 @@ namespace ShopCake.Areas.Admin.Controllers
                 return View(banner);
             }
         }
+<<<<<<< HEAD
 
         // GET: Admin/Banner/Edit/5
+=======
+>>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

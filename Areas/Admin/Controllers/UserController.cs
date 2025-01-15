@@ -15,15 +15,24 @@ namespace ShopCake.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly CakeShopContext _context;
+        private readonly EmailService _emailService;
         private readonly ILogger<UserController> _logger;
+<<<<<<< HEAD
         private readonly EmailService _emailService;
 
         public UserController(CakeShopContext context, ILogger<UserController> logger, EmailService emailService)
+=======
+        public UserController(CakeShopContext context, ILogger<UserController> logger,EmailService emailService)
+>>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
         {
             _logger = logger;
             _context = context;
             _emailService = emailService;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
         }
 
         // GET: Login page
@@ -89,19 +98,29 @@ namespace ShopCake.Areas.Admin.Controllers
                 UserName = register.UserName,
                 Email = register.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(register.Password),
+<<<<<<< HEAD
                 DisplayName = register.UserName,
+=======
+                DisplayName = register.UserName, // Hoặc gán giá trị phù hợp
+>>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
                 CreatedDate = DateTime.UtcNow
             };
 
             _context.AdminUsers.Add(newUser);
             await _context.SaveChangesAsync();
 
+<<<<<<< HEAD
             // Gửi email xác nhận
             await _emailService.SendEmailAsync(newUser.Email, "Registration Successful",
                 $"Dear {newUser.DisplayName},\n\nYour registration was successful. Welcome to our platform!");
+=======
+            // Gửi email thông báo đăng ký thành công từ địa chỉ email ảo
+            await _emailService.SendEmailAsync(register.Email, register.UserName); // Truyền email và tên người dùng
+>>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
 
             return RedirectToAction("Login", "User", new { Area = "Admin" });
         }
+
 
         // POST: Login
         [HttpPost]
@@ -129,6 +148,36 @@ namespace ShopCake.Areas.Admin.Controllers
                     if (user.Role == "Admin")
                     {
                         HttpContext.Session.SetInt32("Admin_USE_ID", user.USE_ID);
+<<<<<<< HEAD
+=======
+
+                        
+                    }
+                    else if (user.Role == null)
+                    {
+                        // Lưu session dành riêng cho user
+                        HttpContext.Session.SetInt32("User_USE_ID", user.USE_ID);
+ 
+                    }
+
+                    // Lưu thông tin đăng nhập vào cookie
+                    var cookieValue = JsonSerializer.Serialize(new LoginDTO
+                    {
+                        USE_ID = user.USE_ID,
+                        Username = login.Username,
+                        Password = user.Password // Lưu mật khẩu mã hóa vào cookie
+                    });
+                    Response.Cookies.Append("UserCredential", cookieValue, new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddDays(7),
+                        HttpOnly = true,
+                        Secure = true // Chỉ hoạt động trên HTTPS
+                    });
+
+                    // Phân quyền theo Role
+                    if (user.Role == "Admin")
+                    {
+>>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
                         return RedirectToAction("Index", "Home", new { area = "Admin" });
                     }
                     else

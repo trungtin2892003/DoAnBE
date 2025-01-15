@@ -17,6 +17,7 @@ namespace ShopCake.Data
         public DbSet<AdminUser> AdminUsers { get; set; }
         // Thêm các DbSet khác nếu cần
 
+<<<<<<< HEAD
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -37,5 +38,8 @@ namespace ShopCake.Data
 
            
         }
+=======
+        
+>>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
     }
 } 

@@ -13,7 +13,7 @@ namespace ShopCake
             var builder = WebApplication.CreateBuilder(args);
             builder.Logging.ClearProviders();  // Xóa các nhà cung cấp logging mặc định nếu cần
             builder.Logging.AddConsole();      // Thêm log vào console (mặc định)
-            builder.Logging.AddDebug();
+            builder.Services.AddScoped<EmailService>();
             // Thêm dịch vụ vào container DI
             builder.Services.AddScoped<CartService>();
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
