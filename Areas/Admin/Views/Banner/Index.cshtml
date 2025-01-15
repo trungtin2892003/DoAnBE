@@ -64,11 +64,11 @@
                                             <td>@Html.DisplayFor(modelItem => item.updatedDate)</td>
                                             <td>@Html.DisplayFor(modelItem => item.updatedBy)</td>
                                             <td>
-                                                <a asp-action="Edit" asp-route-id="@item.BAN_ID" title="Edit" class="text-primary me-2">
-                                                    <i class="fas fa-edit"></i>
+                                                <a asp-action="Edit" asp-route-id="@item.BAN_ID" title="Edit" class="btn btn-sm btn-warning ">
+                                                    <i class="fas fa-edit"></i> Sửa
                                                 </a>
-                                                <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.BAN_ID').submit();" class="text-danger">
-                                                    <i class="fas fa-trash-alt"></i>
+                                                <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.BAN_ID').submit();" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash-alt"></i>Xóa
                                                 </a>
                                                 <form id="deleteForm-@item.BAN_ID" action="@Url.Action("Delete", new { id = item.BAN_ID })" method="post" style="display:none;">
                                                     @Html.AntiForgeryToken()

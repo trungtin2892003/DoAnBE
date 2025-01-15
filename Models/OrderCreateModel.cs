@@ -2,7 +2,7 @@ namespace ShopCake.Models
 {
     using System.ComponentModel.DataAnnotations;
 
-    public class OrderCreateModel
+    public class OrderCreateModel:BaseModel
     {
         [Required(ErrorMessage = "Vui lòng nhập họ tên")]
         public string CustomerName { get; set; }
@@ -19,5 +19,6 @@ namespace ShopCake.Models
 
         [Required(ErrorMessage = "Vui lòng chọn phương thức thanh toán")]
         public string PaymentMethod { get; set; }
+
     }
 } 

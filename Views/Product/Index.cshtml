@@ -35,13 +35,7 @@
                 <div class="col-lg-7 col-md-7">
                     <div class="shop__option__search">
                         <form method="get" action="/Product/Index">
-                            <select name="categoryId" class="form-select">
-                                <option value="">All Categories</option>
-                                @foreach (var category in categories)
-                                {
-                                    <option value="@category.CAT_ID">@category.Name</option>
-                                }
-                            </select>
+                            
                             <input type="text" name="searchQuery" placeholder="Search for products"
                                    value="@Context.Request.Query["searchQuery"]" />
                             <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> Search</button>

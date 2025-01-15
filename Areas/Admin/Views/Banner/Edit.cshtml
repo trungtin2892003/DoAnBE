@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-﻿
-@model ShopCake.Areas.Admin.DTO.BannerDTO
-@{
-    ViewData["Title"] = "Create Banner";
-}
+﻿@model ShopCake.Areas.Admin.DTO.BannerDTO
 
 <div class="row justify-content-center">
     <div class="col-md-8">
@@ -27,22 +22,21 @@
             </div>
 
             <!-- Image Input -->
-            <div class="form-group">
-                <label asp-for="Image" class="control-label">Current Avatar</label>
-                 <!-- Hiển thị ảnh đại diện cũ -->
-                <div>
-                    <img src="~/Data/BannerImg/@Model.Image" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
-                </div>
-                <!-- Input để chọn ảnh mới -->
-                <div class="form-group">
-                    <label>New Avatar Preview</label>
-                    <img id="image-preview" src="~/Data/BannerImg/@Model.Image" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
-                    @*  <img id="image-preview" src="" alt="New Avatar Preview" style="max-width: 200px; height: auto; display: none; margin-top: 10px;" /> *@
-                </div>
-                <input asp-for="Image" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
-                <span asp-validation-for="Image" class="text-danger"></span>
-            </div>
-
+       <div class="form-group">
+                            <label asp-for="Image" class="control-label">Current Avatar</label>
+                            <!-- Input để chọn ảnh mới -->
+                            <div class="form-group">
+                                <img  src="~/Data/BannerImg/@Model.Image" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
+                            <!-- Input để chọn ảnh mới -->
+                            <div class="form-group">
+                                <label>New Avatar Preview</label>
+                                <img id="image-preview" src="~/Data/Product/@Model.Image" alt="Current Avatar" style="max-width: 400px; height: 100px; margin-bottom: 10px;" />
+                               @*  <img id="image-preview" src="" alt="New Avatar Preview" style="max-width: 200px; height: auto; display: none; margin-top: 10px;" /> *@
+                            </div>
+                            <input asp-for="Image" class="form-control" type="file" accept="image/*" onchange="previewImage(event)" />
+                            <span asp-validation-for="Image" class="text-danger"></span>
+                        </div>
+                        </div>
             <!-- URL Input -->
             <div class="row mb-3">
                 <div class="col-md-12">
@@ -53,87 +47,37 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="d-flex justify-content-between">
-                <button type="submit" class="btn btn-primary px-4">Save</button>
-                <a asp-action="Index" class="btn btn-secondary px-4">Back to List</a>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+                            <a asp-controller="Banner" asp-action="Index" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to List
+                            </a>
+
             </div>
+                                    
+
+
         </form>
     </div>
 </div>
-
-@section Header {
-    <link rel="stylesheet" href="~/Admin/plugins/ckeditor5/ckeditor5.css">
-}
-
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
 
-    <script type="module">
-        import {
-            ClassicEditor,
-            Essentials,
-            Paragraph,
-            Bold,
-            Italic,
-            Font
-        } from 'ckeditor5';
-
-        ClassicEditor
-            .create(document.querySelector('[asp-for="Title"]'), {
-                plugins: [Essentials, Paragraph, Bold, Italic, Font],
-                toolbar: [
-                    'undo', 'redo', '|', 'bold', 'italic', '|',
-                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor'
-                ]
-            })
-            .then(editor => {
-                window.editor = editor;
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    </script>
-
-    <script>
-        function previewImage(event) {
-            const input = event.target;
-            const preview = document.getElementById("imagePreview");
-
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    preview.style.display = "block";
-                };
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.style.display = "none";
-            }
-        }
-    </script>
-    <script>
-        function previewImage(event) {
-            const input = event.target;
+        reader.onload = function(e) {
             const preview = document.getElementById('image-preview');
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
 
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
-
-                reader.readAsDataURL(input.files[0]);
-            }
+        if (file) {
+            reader.readAsDataURL(file);
         }
-    </script>
+    }
+</script>
 }
-
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> 9b1d73445bfdc32755d9986e620eb2208a011d18

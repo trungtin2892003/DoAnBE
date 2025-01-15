@@ -16,8 +16,6 @@ namespace ShopCake.Areas.Admin.Controllers
         private readonly IWebHostEnvironment _hostEnv;
         private const string BannerFolderName = "BannerImg";
 
-
-       
         public BannerController(CakeShopContext context, IWebHostEnvironment hostEnv)
         {
             _context = context;
@@ -25,10 +23,18 @@ namespace ShopCake.Areas.Admin.Controllers
         }
 
         // GET: Admin/Banner
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            var banners = await _context.Banners.AsNoTracking().ToListAsync();
-            return View(banners);
+            ViewData["CurrentFilter"] = searchString;
+
+            var banners = _context.Banners.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                banners = banners.Where(b => b.Title.Contains(searchString));
+            }
+
+            return View(await banners.ToListAsync());
         }
 
         // GET: Admin/Banner/Details/5
@@ -73,11 +79,18 @@ namespace ShopCake.Areas.Admin.Controllers
                 return View(banner);
             }
 
+            if (await _context.Banners.AnyAsync(b => b.DisplayOrder == banner.DisplayOrder))
+            {
+                ModelState.AddModelError("DisplayOrder", "DisplayOrder đã tồn tại. Vui lòng chọn giá trị khác.");
+                return View(banner);
+            }
+
             var newBanner = new Banner
             {
                 BAN_ID = banner.BAN_ID,
                 Title = banner.Title,
                 Url = banner.Url,
+                DisplayOrder = banner.DisplayOrder,
                 createdBy = userInfo.UserName,
                 updatedBy = userInfo.UserName
             };
@@ -85,7 +98,7 @@ namespace ShopCake.Areas.Admin.Controllers
             try
             {
                 string newImageFileName = await SaveImageAsync(banner.Image);
-                newBanner.Image = newImageFileName;
+                newBanner.Image = newImageFileName; // Lưu tên tệp ảnh
 
                 _context.Add(newBanner);
                 await _context.SaveChangesAsync();
@@ -99,8 +112,6 @@ namespace ShopCake.Areas.Admin.Controllers
                 return View(banner);
             }
         }
-
-
 
         // GET: Admin/Banner/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -124,11 +135,13 @@ namespace ShopCake.Areas.Admin.Controllers
                 BAN_ID = banner.BAN_ID,
                 Title = banner.Title,
                 Url = banner.Url,
-                DisplayOrder = banner.DisplayOrder
+                DisplayOrder = banner.DisplayOrder,
+                Image = null // Không cần gửi ảnh hiện tại vào DTO, chỉ cần xử lý ảnh mới nếu có
             };
 
             return View(bannerDto);
         }
+
         // POST: Admin/Banner/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -153,6 +166,13 @@ namespace ShopCake.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // Kiểm tra DisplayOrder có bị trùng với banner khác không, ngoại trừ banner hiện tại
+            if (await _context.Banners.AnyAsync(b => b.DisplayOrder == bannerDto.DisplayOrder && b.BAN_ID != id))
+            {
+                ModelState.AddModelError("DisplayOrder", "DisplayOrder đã tồn tại. Vui lòng chọn giá trị khác.");
+                return View(bannerDto);
+            }
+
             try
             {
                 // Map DTO to entity
@@ -160,16 +180,17 @@ namespace ShopCake.Areas.Admin.Controllers
                 existingBanner.Url = bannerDto.Url;
                 existingBanner.DisplayOrder = bannerDto.DisplayOrder;
 
+                // Kiểm tra nếu có ảnh mới được tải lên
                 if (bannerDto.Image != null && bannerDto.Image.Length > 0)
                 {
-                    // Delete old image if any
+                    // Xóa ảnh cũ nếu có
                     if (!string.IsNullOrEmpty(existingBanner.Image))
                     {
                         DeleteImage(existingBanner.Image);
                     }
 
-                    // Save new image and update path
-                    existingBanner.Image = await SaveImageAsync(bannerDto.Image);
+                    // Lưu ảnh mới và cập nhật tên tệp
+                    existingBanner.Image = await SaveImageAsync(bannerDto.Image); // Lưu tên tệp ảnh
                 }
 
                 _context.Update(existingBanner);

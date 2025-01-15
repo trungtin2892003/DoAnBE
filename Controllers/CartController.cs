@@ -1,15 +1,9 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using ShopCake.Areas.Admin.DTO;
 using ShopCake.Models;
-using ShopCake.Unity;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+
+
 
 namespace ShopCake.Controllers
 {
@@ -30,7 +24,7 @@ namespace ShopCake.Controllers
             if (!userId.HasValue)
             {
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để tiếp tục!";
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Index", "Home");
             }
 
             // Lấy giỏ hàng theo USE_ID
@@ -74,10 +68,7 @@ namespace ShopCake.Controllers
                     _logger.LogInformation($"Total amount: {totalAmount}");
 
                     // Tạo order
-                    var member = await _context.Members
-                        .FirstOrDefaultAsync(m => m.USE_ID == userId.Value);
-
-                    _logger.LogInformation($"Found member: {member?.MEM_ID}");
+                  
 
                     var order = new Order
                     {
@@ -90,7 +81,7 @@ namespace ShopCake.Controllers
                         Status = 1,
                         IsPaid = false,
                         USE_ID = userId.Value,
-                        MEM_ID = member?.MEM_ID,
+                       
                         CreatedDate = DateTime.Now,
                         createdBy = userId.Value.ToString(),
                         updatedDate = DateTime.Now,
@@ -119,6 +110,17 @@ namespace ShopCake.Controllers
                     await _context.SaveChangesAsync();
                     _logger.LogInformation($"Added {orderDetails.Count} order details");
 
+                    foreach (var cartItem in cartItems)
+                    {
+                        var product = await _context.Products.FirstOrDefaultAsync(p => p.PRO_ID == cartItem.PRO_ID);
+                        if (product != null)
+                        {
+                            product.SlOrder += cartItem.Quantity;  // Tăng số lượng đã bán
+                            _context.Products.Update(product);
+                        }
+
+                    }
+
                     // Xóa cart items
                     _context.Carts.RemoveRange(cartItems);
                     await _context.SaveChangesAsync();
@@ -143,7 +145,8 @@ namespace ShopCake.Controllers
             {
                 _logger.LogError(ex, "Error in ProcessCheckout");
                 var errorMessage = ex.InnerException?.Message ?? ex.Message;
-                return StatusCode(500, new { 
+                return StatusCode(500, new
+                {
                     message = "Có lỗi xảy ra khi xử lý đơn hàng. Vui lòng thử lại.",
                     error = errorMessage
                 });
@@ -153,17 +156,19 @@ namespace ShopCake.Controllers
         // GET: Cart/OrderSuccess/5
         public async Task<IActionResult> OrderSuccess(int id)
         {
-            var orderDetails = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .ThenInclude(od => od.Product)
-                .FirstOrDefaultAsync(o => o.ORD_ID == id);
+            var order = await _context.Orders
+    .FirstOrDefaultAsync(o => o.ORD_ID == id);
 
-            if (orderDetails == null)
+            if (order == null)
             {
                 return NotFound();
             }
 
-            return View(orderDetails);
+            // Then fetch the order details separately
+          
+
+            return View( order);
+
         }
 
         // Thêm sản phẩm vào giỏ hàng

@@ -1,4 +1,4 @@
-﻿@{
+﻿﻿@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -24,9 +24,9 @@
     <div class="login-box">
         <div class="card card-outline card-warning">
             <div class="card-header">
-                <a href="#" class="link-dark text-center link-offset-2 link-opacity-100 link-opacity-50-hover">
-                    <h1 class="mb-0"> <b>Admin</b>LTE</h1>
-                </a>
+
+                <h1 class="mb-0"> <b>Shop</b>Cake</h1>
+
             </div>
             <div class="card-body login-card-body rounded">
                 <p class="login-box-msg text-danger">@ViewData["Message"]</p>
@@ -47,9 +47,7 @@
                                 </label>
                             </div>
                         </div> <!-- /.col -->
-                        <div class="col-4">
-                            <div class="d-grid "> <a asp-action="Register" asp-controller="User" asp-area="Admin" class="btn btn-warning">Register</a> </div>
-                        </div>
+
                         <form method="post" action="/Login">
                             @Html.AntiForgeryToken()
                             <!-- Các trường nhập liệu -->
@@ -59,16 +57,13 @@
                                 </div>
                             </div>
                         </form>
+                        <a asp-action="Register" asp-controller="User" asp-area="Admin">Created Account Now</a>
+
 
                         <!-- /.col -->
                     </div> <!--end::Row-->
                 </form>
-                <!-- <div class="social-auth-links text-center mb-3 d-grid gap-2">
-                    <p>- OR -</p> <a href="#" class="btn btn-primary"> <i class="bi bi-facebook me-2"></i> Sign in using Facebook
-                    </a> <a href="#" class="btn btn-danger"> <i class="bi bi-google me-2"></i> Sign in using Google+
-                    </a>
-                </div>
-                <p class="mb-0"> <a href="forgot-password.html">I forgot my password</a> </p> -->
+
             </div> <!-- /.login-card-body -->
         </div>
     </div> <!-- /.login-box -->

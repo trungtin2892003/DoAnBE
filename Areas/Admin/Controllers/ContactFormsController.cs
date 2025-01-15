@@ -10,23 +10,22 @@ using ShopCake.Models;
 namespace ShopCake.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class ReviewsController : Controller
+    public class ContactFormsController : Controller
     {
         private readonly CakeShopContext _context;
 
-        public ReviewsController(CakeShopContext context)
+        public ContactFormsController(CakeShopContext context)
         {
             _context = context;
         }
 
-        // GET: Admin/Reviews
+        // GET: Admin/ContactForms
         public async Task<IActionResult> Index()
         {
-            var cakeShopContext = _context.Reviews.Include(r => r.Member).Include(r => r.Product);
-            return View(await cakeShopContext.ToListAsync());
+            return View(await _context.ContactForms.ToListAsync());
         }
 
-        // GET: Admin/Reviews/Details/5
+        // GET: Admin/ContactForms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,45 +33,39 @@ namespace ShopCake.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var review = await _context.Reviews
-                .Include(r => r.Member)
-                .Include(r => r.Product)
-                .FirstOrDefaultAsync(m => m.REV_ID == id);
-            if (review == null)
+            var contactForm = await _context.ContactForms
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (contactForm == null)
             {
                 return NotFound();
             }
 
-            return View(review);
+            return View(contactForm);
         }
 
-        // GET: Admin/Reviews/Create
+        // GET: Admin/ContactForms/Create
         public IActionResult Create()
         {
-            ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID");
-            ViewData["PRO_ID"] = new SelectList(_context.Products, "PRO_ID", "PRO_ID");
             return View();
         }
 
-        // POST: Admin/Reviews/Create
+        // POST: Admin/ContactForms/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("REV_ID,MEM_ID,PRO_ID,Rate,Content,ReviewDate,CreatedDate,createdBy,updatedDate,updatedBy")] Review review)
+        public async Task<IActionResult> Create([Bind("Id,Name,Email,Message")] ContactForm contactForm)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(review);
+                _context.Add(contactForm);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID", review.MEM_ID);
-            ViewData["PRO_ID"] = new SelectList(_context.Products, "PRO_ID", "PRO_ID", review.PRO_ID);
-            return View(review);
+            return View(contactForm);
         }
 
-        // GET: Admin/Reviews/Edit/5
+        // GET: Admin/ContactForms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,24 +73,22 @@ namespace ShopCake.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var review = await _context.Reviews.FindAsync(id);
-            if (review == null)
+            var contactForm = await _context.ContactForms.FindAsync(id);
+            if (contactForm == null)
             {
                 return NotFound();
             }
-            ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID", review.MEM_ID);
-            ViewData["PRO_ID"] = new SelectList(_context.Products, "PRO_ID", "PRO_ID", review.PRO_ID);
-            return View(review);
+            return View(contactForm);
         }
 
-        // POST: Admin/Reviews/Edit/5
+        // POST: Admin/ContactForms/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("REV_ID,MEM_ID,PRO_ID,Rate,Content,ReviewDate,CreatedDate,createdBy,updatedDate,updatedBy")] Review review)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Message")] ContactForm contactForm)
         {
-            if (id != review.REV_ID)
+            if (id != contactForm.Id)
             {
                 return NotFound();
             }
@@ -106,12 +97,12 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(review);
+                    _context.Update(contactForm);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ReviewExists(review.REV_ID))
+                    if (!ContactFormExists(contactForm.Id))
                     {
                         return NotFound();
                     }
@@ -122,12 +113,10 @@ namespace ShopCake.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["MEM_ID"] = new SelectList(_context.Members, "MEM_ID", "MEM_ID", review.MEM_ID);
-            ViewData["PRO_ID"] = new SelectList(_context.Products, "PRO_ID", "PRO_ID", review.PRO_ID);
-            return View(review);
+            return View(contactForm);
         }
 
-        // GET: Admin/Reviews/Delete/5
+        // GET: Admin/ContactForms/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -135,36 +124,34 @@ namespace ShopCake.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var review = await _context.Reviews
-                .Include(r => r.Member)
-                .Include(r => r.Product)
-                .FirstOrDefaultAsync(m => m.REV_ID == id);
-            if (review == null)
+            var contactForm = await _context.ContactForms
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (contactForm == null)
             {
                 return NotFound();
             }
 
-            return View(review);
+            return View(contactForm);
         }
 
-        // POST: Admin/Reviews/Delete/5
+        // POST: Admin/ContactForms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var review = await _context.Reviews.FindAsync(id);
-            if (review != null)
+            var contactForm = await _context.ContactForms.FindAsync(id);
+            if (contactForm != null)
             {
-                _context.Reviews.Remove(review);
+                _context.ContactForms.Remove(contactForm);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ReviewExists(int id)
+        private bool ContactFormExists(int id)
         {
-            return _context.Reviews.Any(e => e.REV_ID == id);
+            return _context.ContactForms.Any(e => e.Id == id);
         }
     }
 }

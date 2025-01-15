@@ -35,15 +35,7 @@ namespace ShopCake.Data
                     .IsRequired(false);
             });
 
-            modelBuilder.Entity<Member>(entity =>
-            {
-                entity.HasKey(e => e.MEM_ID);
-
-                entity.HasOne(d => d.User)
-                    .WithMany()
-                    .HasForeignKey(d => d.USE_ID)
-                    .IsRequired(false);
-            });
+           
         }
     }
 } 

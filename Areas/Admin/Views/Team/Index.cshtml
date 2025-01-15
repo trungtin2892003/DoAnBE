@@ -95,10 +95,10 @@
                 @Html.DisplayFor(modelItem => item.updatedBy)
             </td>
             <td>
-                                                <a asp-action="Edit" asp-route-id="@item.TEAM_ID" class="text-primary"><i class="fas fa-edit"></i></a> |
+                                                <a asp-action="Edit" asp-route-id="@item.TEAM_ID" class="btn btn-sm btn-warning "><i class="fas fa-edit"></i> Sửa</a> |
 @*                  <a asp-action="Details" asp-route-id="@item.TEAM_ID">Details</a> |
-                                            *@                                                 <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.TEAM_ID').submit();" class="text-danger">
-                                                    <i class="fas fa-trash-alt"></i>
+                                            *@                                                 <a href="#" onclick="event.preventDefault(); document.getElementById('deleteForm-@item.TEAM_ID').submit();" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash-alt"></i>Xóa
                                                 </a>
                                                 <form id="deleteForm-@item.TEAM_ID" action="@Url.Action("Delete", new { id = item.TEAM_ID })" method="post" style="display:none;">
                                                     @Html.AntiForgeryToken()

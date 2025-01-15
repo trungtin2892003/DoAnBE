@@ -1,6 +1,8 @@
 ﻿using ShopCake.Models;
 using Microsoft.EntityFrameworkCore;
 using ShopCake.Controllers;
+using ShopCake.Areas.Admin.DTO;
+using ShopCake.Areas.Admin.Service;
 
 namespace ShopCake
 {
@@ -14,6 +16,10 @@ namespace ShopCake
             builder.Logging.AddDebug();
             // Thêm dịch vụ vào container DI
             builder.Services.AddScoped<CartService>();
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.AddTransient<EmailService>();
+
+
             // Đăng ký DbContext
             builder.Services.AddDbContext<CakeShopContext>(opt =>
                 opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -43,6 +49,7 @@ namespace ShopCake
             app.UseStaticFiles();
 
             app.UseRouting();
+          
 
             // Kích hoạt session (bắt buộc để sử dụng session)
             app.UseSession();

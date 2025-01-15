@@ -43,15 +43,20 @@ namespace ShopCake.Controllers
             // Lấy thông tin sản phẩm từ cơ sở dữ liệu dựa trên ID
             var product = _context.Products.AsTracking().
                 Include(x => x.Category)
+                 .Include(p => p.Review)
+        .ThenInclude(r => r.Member)
                 .FirstOrDefault(p => p.PRO_ID == id);
             if (product == null)
             {
                 // Nếu không tìm thấy sản phẩm, chuyển hướng đến trang lỗi
                 return NotFound();
             }
-
+            var firstReview = product.Review.FirstOrDefault(); // Lấy review đầu tiên
+            var memberId = firstReview?.Member?.MEM_ID;
             ViewData["Title"] = "Chi tiet san pham";
             return View(product);
         }
+       
+
     }
 }

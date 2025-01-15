@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopCake.Areas.Admin.DTO;
 using ShopCake.Models;
 using ShopCake.Unity;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ShopCake.Areas.Admin.Controllers
 {
@@ -24,7 +22,8 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Admin/Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categories.OrderBy(c => c.DisplayOrder).ToListAsync());
+            var categories = await _context.Categories.OrderBy(c => c.DisplayOrder).ToListAsync();
+            return View(categories);
         }
 
         // GET: Admin/Categories/Details/5
@@ -48,40 +47,40 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Admin/Categories/Create
         public IActionResult Create()
         {
-
             return View();
         }
 
         // POST: Admin/Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] Category category)
         {
-            // Lấy thông tin người dùng từ session
             var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
 
             if (userInfo != null)
             {
-                category.createdBy=category.updatedBy = userInfo.UserName;
+                category.createdBy = category.updatedBy = userInfo.UserName;
             }
             else
             {
-                // Nếu không có thông tin người dùng trong session, trả về lỗi hoặc redirect.
                 return RedirectToAction("Login", "User");
             }
+
             if (int.TryParse(category.Name, out _))
             {
                 ModelState.AddModelError("Name", "Tên danh mục không được là số.");
             }
-            // Kiểm tra các điều kiện khác nếu cần
+
             if (_context.Categories.Any(c => c.Name == category.Name))
             {
                 ModelState.AddModelError("Name", "Tên danh mục đã tồn tại.");
             }
 
-            // Kiểm tra tính hợp lệ của model
+            if (_context.Categories.Any(c => c.DisplayOrder == category.DisplayOrder))
+            {
+                ModelState.AddModelError("DisplayOrder", "DisplayOrder đã tồn tại. Vui lòng chọn giá trị khác.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(category);
@@ -91,7 +90,6 @@ namespace ShopCake.Areas.Admin.Controllers
 
             return View(category);
         }
-
 
         // GET: Admin/Categories/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -110,11 +108,9 @@ namespace ShopCake.Areas.Admin.Controllers
         }
 
         // POST: Admin/Categories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [FromForm] CategoryDTO categoryDTO)
+        public async Task<IActionResult> Edit(int id, [FromForm] Category category)
         {
             var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
 
@@ -123,40 +119,39 @@ namespace ShopCake.Areas.Admin.Controllers
                 return RedirectToAction("Login", "User", new { area = "Admin" });
             }
 
-            // Kiểm tra nếu id không hợp lệ
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            if (id != category.CAT_ID)
             {
                 return NotFound();
             }
 
-            // Kiểm tra dữ liệu tên danh mục
-            if (int.TryParse(categoryDTO.name, out _))
+            if (int.TryParse(category.Name, out _))
             {
                 ModelState.AddModelError("Name", "Tên danh mục không được là số.");
             }
-            // Kiểm tra nếu tên danh mục đã tồn tại
-            if (_context.Categories.Any(c => c.Name == categoryDTO.name && c.CAT_ID != id))
+
+            if (_context.Categories.Any(c => c.Name == category.Name && c.CAT_ID != id))
             {
                 ModelState.AddModelError("Name", "Tên danh mục đã tồn tại.");
             }
 
+            if (_context.Categories.Any(c => c.DisplayOrder == category.DisplayOrder && c.CAT_ID != id))
+            {
+                ModelState.AddModelError("DisplayOrder", "DisplayOrder đã tồn tại. Vui lòng chọn giá trị khác.");
+            }
+
             if (ModelState.IsValid)
             {
-                // Chuyển đổi từ DTO sang entity
-                category.Name = categoryDTO.name;
-                category.DisplayOrder = categoryDTO.DisplayOrder;
                 category.updatedBy = userInfo.UserName;
-                category.updatedDate = DateTime.Now; // Cập nhật thời gian sửa đổi
+                category.updatedDate = DateTime.Now;
 
                 try
                 {
-                    _context.Update(category); // Cập nhật entity
-                    await _context.SaveChangesAsync(); // Lưu thay đổi vào DB
+                    _context.Update(category);
+                    await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.CAT_ID))
+                    if (!_context.Categories.Any(e => e.CAT_ID == id))
                     {
                         return NotFound();
                     }
@@ -165,17 +160,11 @@ namespace ShopCake.Areas.Admin.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index)); // Quay lại danh sách
+                return RedirectToAction(nameof(Index));
             }
 
-            return View(categoryDTO); // Trả về View nếu có lỗi
+            return View(category);
         }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.CAT_ID == id);
-        }
-
 
         // GET: Admin/Categories/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -196,34 +185,30 @@ namespace ShopCake.Areas.Admin.Controllers
         }
 
         // POST: Admin/Categories/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            // Kiểm tra danh mục có tồn tại không
-            var category = _context.Categories.FirstOrDefault(c => c.CAT_ID == id);
-            if (category == null)
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
             {
-                return NotFound();
+                var hasProducts = _context.Products.Any(p => p.CAT_ID == id);
+                if (hasProducts)
+                {
+                    TempData["ErrorMessage"] = "Cannot delete this category because it has associated products.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Category deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Category not found.";
             }
 
-            // Kiểm tra xem danh mục có sản phẩm nào không
-            var hasProducts = _context.Products.Any(p => p.CAT_ID == id); // Thay `CategoryId` bằng tên khóa ngoại tương ứng
-            if (hasProducts)
-            {
-                TempData["ErrorMessage"] = "Cannot delete this category because it has associated products.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Xóa danh mục
-            _context.Categories.Remove(category);
-            _context.SaveChanges();
-
-            TempData["SuccessMessage"] = "Category deleted successfully.";
             return RedirectToAction(nameof(Index));
         }
-
-
-        
     }
 }

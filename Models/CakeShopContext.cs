@@ -21,6 +21,7 @@ namespace ShopCake.Models
         public DbSet<Team> Teams { get; set; } // Thêm bảng Team
         public DbSet<Cart> Carts { get; set; } // Thêm bảng Carts
         public DbSet<CartDetail> CartDetails { get; set; } // Thêm bảng CartDetails
+        public DbSet<ContactForm> ContactForms { get; set; }
 
     }
 }

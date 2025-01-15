@@ -14,8 +14,6 @@ namespace ShopCake.Models
         [Required]
         [MaxLength(255)]
         public required string UserName { get; set; }
-
-
         [Required]
         public required string DisplayName { get; set; }
         public required string Password { get; set; }

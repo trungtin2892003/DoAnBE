@@ -21,7 +21,7 @@ namespace ShopCake.Models
         [Range(1, 1000, ErrorMessage = "Giá sản phẩm phải từ 0 đến 1000.")]
         [DisplayFormat(DataFormatString = "{0:0,0.000} VND")]
         public decimal Price { get; set; }
-        [Range(1, 1000, ErrorMessage = "Giảm giá sản phẩm phải từ 0 đến 1000.")]
+        [Range(0, 1000, ErrorMessage = "Giảm giá sản phẩm phải từ 0 đến 1000.")]
         [DisplayFormat(DataFormatString = "{0:0,0.000} VND")]
         public decimal DiscountPrice { get; set; }
         public string? Unit { get; set; }

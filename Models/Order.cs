@@ -14,9 +14,9 @@ namespace ShopCake.Models
         public string? CustomerName { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
-        public int TotalPrice { get; set; }
+        public decimal TotalPrice { get; set; }
         public double Discount { get; set; }
-        public string? PaymentMethod { get; set; }
+        public string PaymentMethod { get; set; }
         public bool IsPaid { get; set; }
         public string? Note { get; set; }
         public int Status { get; set; }
@@ -27,6 +27,7 @@ namespace ShopCake.Models
         [ForeignKey("MEM_ID")]
         public virtual Member? Member { get; set; }
 
-        public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        //public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+        public ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using System.Text.Json;
 using ShopCake.Unity;
 using Microsoft.AspNetCore.Identity;
 using BCrypt.Net;
+using ShopCake.Areas.Admin.Service;
 
 
 namespace ShopCake.Areas.Admin.Controllers
@@ -15,11 +16,14 @@ namespace ShopCake.Areas.Admin.Controllers
     {
         private readonly CakeShopContext _context;
         private readonly ILogger<UserController> _logger;
-        public UserController(CakeShopContext context, ILogger<UserController> logger)
+        private readonly EmailService _emailService;
+
+        public UserController(CakeShopContext context, ILogger<UserController> logger, EmailService emailService)
         {
             _logger = logger;
             _context = context;
-            
+            _emailService = emailService;
+
         }
 
         // GET: Login page
@@ -84,16 +88,19 @@ namespace ShopCake.Areas.Admin.Controllers
             {
                 UserName = register.UserName,
                 Email = register.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(register.Password), // Mã hóa password
-                DisplayName = register.UserName, // Hoặc gán giá trị phù hợp
+                Password = BCrypt.Net.BCrypt.HashPassword(register.Password),
+                DisplayName = register.UserName,
                 CreatedDate = DateTime.UtcNow
             };
 
-
             _context.AdminUsers.Add(newUser);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Login", "User", new { Area = "Admin" });
 
+            // Gửi email xác nhận
+            await _emailService.SendEmailAsync(newUser.Email, "Registration Successful",
+                $"Dear {newUser.DisplayName},\n\nYour registration was successful. Welcome to our platform!");
+
+            return RedirectToAction("Login", "User", new { Area = "Admin" });
         }
 
         // POST: Login
@@ -101,59 +108,42 @@ namespace ShopCake.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginDTO login)
         {
-            // Tìm kiếm người dùng theo tên đăng nhập
             var user = await _context.AdminUsers
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.UserName == login.Username);
+        .AsNoTracking()
+        .FirstOrDefaultAsync(x => x.UserName == login.Username);
 
             if (user != null)
             {
                 // Kiểm tra mật khẩu đã mã hóa
                 if (BCrypt.Net.BCrypt.Verify(login.Password, user.Password))
                 {
+                    // Kiểm tra role có phải null không
+                    if (user.Role == null)
+                    {
+                        ModelState.AddModelError(string.Empty, "Your account does not have a valid role.");
+                        return View();
+                    }
+
                     // Lưu thông tin người dùng vào session
                     HttpContext.Session.Set("userInfo", user);
                     if (user.Role == "Admin")
                     {
-                        // Lưu session dành riêng cho admin
                         HttpContext.Session.SetInt32("Admin_USE_ID", user.USE_ID);
-
-                        
-                    }
-                    else if (user.Role == "")
-                    {
-                        // Lưu session dành riêng cho user
-                        HttpContext.Session.SetInt32("User_USE_ID", user.USE_ID);
-
-                        
-                    }
-
-                    // Lưu thông tin đăng nhập vào cookie
-                    var cookieValue = JsonSerializer.Serialize(new LoginDTO
-                    {
-                        Username = login.Username,
-                        Password = user.Password // Lưu mật khẩu mã hóa vào cookie
-                    });
-                    Response.Cookies.Append("UserCredential", cookieValue, new CookieOptions
-                    {
-                        Expires = DateTimeOffset.UtcNow.AddDays(7),
-                        HttpOnly = true,
-                        Secure = true // Chỉ hoạt động trên HTTPS
-                    });
-
-                    // Phân quyền theo Role
-                    if (user.Role == "Admin")
-                    {
                         return RedirectToAction("Index", "Home", new { area = "Admin" });
                     }
                     else
                     {
+                        HttpContext.Session.SetInt32("User_USE_ID", user.USE_ID);
                         return RedirectToAction("Index", "Home", new { area = "" });
                     }
                 }
             }
-            return View();
+
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return View(); ;
         }
+
+
 
 
         // POST: Logout
@@ -174,11 +164,14 @@ namespace ShopCake.Areas.Admin.Controllers
         // GET: Index
         public IActionResult Index()
         {
-            // Lấy tên người dùng từ session
-            var userName = HttpContext.Session.GetString("UserName");
+            var userInfo = HttpContext.Session.Get<AdminUser>("userInfo");
 
-            // Chuyển dữ liệu vào View
-            ViewBag.UserName = userName;
+            // Kiểm tra xem người dùng có phải admin không
+            if (userInfo == null || userInfo.Role != "Admin")
+            {
+                // Nếu không phải admin, chuyển hướng về trang chính hoặc hiển thị thông báo lỗi
+                return RedirectToAction("Index", "Home");
+            }
 
             return View();
         }

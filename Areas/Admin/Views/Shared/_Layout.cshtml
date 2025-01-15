@@ -1,14 +1,15 @@
 ﻿@using ShopCake.Unity
 @{
     var userInfo = Context.Session.Get<AdminUser>("userInfo");
-    if (userInfo == null)
+
+    // Kiểm tra nếu không có thông tin người dùng trong session hoặc người dùng không phải Admin
+    if (userInfo == null || userInfo.Role != "Admin")
     {
-
+        // Nếu không phải admin hoặc không có session, chuyển hướng về trang login của admin
         Context.Response.Redirect("/Admin/User/Login");
-
     }
-   
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -243,6 +244,15 @@
                             <a asp-area="Admin" asp-controller="Order" asp-action="index" class="nav-link">
                                 <i class="fa-solid fa-money-bill-wave"></i>                           <p>
                                     Order
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-area="Admin" asp-controller="ContactForms" asp-action="index" class="nav-link">
+                                <i class="fa-solid fa-message-text"></i>                              <p>
+                                    Contact
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
