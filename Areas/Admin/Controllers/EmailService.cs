@@ -6,7 +6,7 @@ public class EmailService
 {
     private readonly string _apiKey = "your-sendgrid-api-key";
 
-    public async Task SendEmailAsync(string toEmail, string userName)
+    public async Task SendEmailAsync(string toEmail, string userName, string v)
     {
         var client = new SendGridClient(_apiKey);
         var from = new EmailAddress("shopcake@gmail.com", "Shop bánh ngọt");

@@ -1,8 +1,7 @@
-﻿<!DOCTYPE html>
-<html lang="zxx">
+﻿@using ShopCake.Unity
 @{
-    var isAuthenticated = Context.Session.GetInt32("USE_ID") != null;
-    var userRole = Context.Session.GetString("userRole");
+    var userInfo = Context.Session.Get<AdminUser>("userInfo");
+   
 }
 
 
@@ -44,45 +43,6 @@
     <div id="preloder">
         <div class="loader"></div>
     </div>
-
-    <!-- Offcanvas Menu Begin -->
-    <div class="offcanvas-menu-overlay"></div>
-    <div class="offcanvas-menu-wrapper">
-        <div class="offcanvas__cart">
-            <div class="offcanvas__cart__links">
-                <a href="#" class="search-switch"><img src="img/icon/search.png" alt=""></a>
-                <a href="#"><img src="img/icon/heart.png" alt=""></a>
-            </div>
-            <div class="offcanvas__cart__item">
-                <a href="#"><img src="img/icon/cart.png" alt=""> <span>0</span></a>
-                <div class="cart__price">Cart: <span>$0.00</span></div>
-            </div>
-        </div>
-        <div class="offcanvas__logo">
-            <a href="./index.html"><img src="~/img/logo.png" alt=""></a>
-        </div>
-        <div id="mobile-menu-wrap"></div>
-        <div class="offcanvas__option">
-            <ul>
-                <li>
-                    USD <span class="arrow_carrot-down"></span>
-                    <ul>
-                        <li>EUR</li>
-                        <li>USD</li>
-                    </ul>
-                </li>
-                <li>
-                    ENG <span class="arrow_carrot-down"></span>
-                    <ul>
-                        <li>Spanish</li>
-                        <li>ENG</li>
-                    </ul>
-                </li>
-                <li><a asp-area="Admin" asp-controller="User" asp-action="Login">Sign in</a> <span class="arrow_carrot-down"></span></li>
-            </ul>
-        </div>
-    </div>
-    <!-- Offcanvas Menu End -->
     <!-- Header Section Begin -->
     <header class="header">
         <div class="header__top">
@@ -93,19 +53,19 @@
                             <div class="header__top__left">
                                 <ul>
                                     <li>
-                                        @if (isAuthenticated)
-                                        {
+                                       
                                             <form asp-controller="User" asp-area="Admin" asp-action="Logout" method="post" style="display:inline;">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-default btn-flat"><i class="fas fa-user fa-2x"></i>Đăng xuất</button>
+                                                
+                                                <button type="submit" class="btn btn-default btn-flat">
+
+                                                    <i class="fas fa-user fa-2x"></i> @userInfo?.DisplayName
+                                                </button>
                                             </form>
-                                          
-                                        }
-                                        else
-                                        {
-                                            <a asp-controller="User" asp-action="Login" asp-area="Admin" class="btn btn-default btn-flat"><i class="fas fa-sign-in-alt fa-2x"></i> Đăng nhập</a>
-                                        }
+                                     
+                                       
                                     </li>
+
 
 
                                 </ul>
@@ -119,9 +79,14 @@
                                     <a href="#"><img src="img/icon/heart.png" alt=""></a>
                                 </div>
                                 <div class="header__top__right__cart">
-                                    <a asp-controller="Cart" asp-action="Index"><img src="~/img/icon/cart.png" alt=""> <span>0</span></a>
-                                   
+                                    <a asp-controller="Cart" asp-action="Index" class="cart-link">
+                                        <i class="fas fa-shopping-cart  cart-icon" aria-hidden="true"></i>
+                                       
+                                    </a>
+                                    <span id="cart-count" class="cart-count">0</span>
                                 </div>
+
+
                             </div>
                             @if (TempData["ErrorMessage"] != null)
                             {
@@ -250,3 +215,79 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script>
+    function updateCartCount() {
+        fetch('/Cart/GetCartCount')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('cart-count').innerText = data.count;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Gọi hàm khi tải trang
+    updateCartCount();
+
+    // Gọi lại mỗi khi thêm sản phẩm vào giỏ hàng
+    document.querySelectorAll('.add-to-cart-button').forEach(button => {
+        button.addEventListener('click', () => {
+            updateCartCount();
+        });
+    });
+</script>
+<style>
+    /* Vùng chứa giỏ hàng */
+    .header__top__right__cart {
+        position: relative;
+        display: inline-block;
+    }
+
+    /* Phong cách link giỏ hàng */
+    .cart-link {
+        position: relative;
+        text-decoration: none;
+        color: #343a40; /* Màu chữ/icon mặc định */
+        font-size: 24px; /* Kích thước icon */
+        display: flex;
+        align-items: center;
+        transition: color 0.3s ease;
+    }
+
+        .cart-link:hover {
+            color: #ff5722; /* Đổi màu khi hover */
+        }
+
+    /* Phong cách icon giỏ hàng */
+    .cart-icon {
+        font-size: 32px; /* Kích thước icon giỏ hàng */
+        color: #343a40;
+        position: relative;
+    }
+
+    /* Phong cách cho số lượng sản phẩm */
+    .cart-count {
+        position: absolute;
+        top: -10px; /* Căn chỉnh số lượng lên trên icon */
+        right: -10px; /* Căn chỉnh số lượng sang phải */
+        background-color: #f7dc6f; /* Màu nền vàng nhạt */
+        color: #000000; /* Màu chữ đen */
+        font-size: 14px; /* Kích thước chữ lớn hơn */
+        font-weight: bold; /* Chữ đậm */
+        width: 22px; /* Độ rộng hình tròn */
+        height: 22px; /* Độ cao hình tròn */
+        line-height: 22px; /* Canh giữa số lượng trong hình tròn */
+        text-align: center;
+        border-radius: 50%; /* Làm tròn hình nền */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Hiệu ứng đổ bóng */
+        pointer-events: none; /* Không cho click vào số lượng */
+        border: 2px solid #ffffff; /* Viền trắng tạo độ phân cách với icon */
+    }
+
+    /* Hiệu ứng hover cho giỏ hàng */
+    .cart-link:hover .cart-icon {
+        transform: scale(1.1); /* Phóng to icon khi hover */
+        transition: transform 0.2s ease-in-out;
+    }
+
+
+</style>

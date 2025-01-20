@@ -48,8 +48,9 @@ namespace ShopCake.Controllers
                .OrderBy(x => x.Price)  // S?p x?p s?n ph?m theo giá
               .ToList();  // L?y danh sách s?n ph?m sau khi s?p x?p
             ViewData["Banner"] = _context.Banners.AsNoTracking().OrderBy(b => b.DisplayOrder).ToList();
-
-            return View();
+			var isAuthenticated = HttpContext.Session.GetInt32("User_USE_ID") != null;
+			ViewBag.IsAuthenticated = isAuthenticated;
+			return View();
         }
         public IActionResult Contact()
         {

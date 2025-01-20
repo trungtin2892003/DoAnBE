@@ -14,10 +14,8 @@ namespace ShopCake.Models
         [Required]
         [MaxLength(255)]
         public required string UserName { get; set; }
-<<<<<<< HEAD
-=======
-
->>>>>>> dc9e599519289a7c5ee66623e071d2e7fa9edef8
+        public string? ResetPasswordToken { get; set; }
+        public DateTime? ResetPasswordExpiry {  get; set; }
         [Required]
         public required string DisplayName { get; set; }
 
